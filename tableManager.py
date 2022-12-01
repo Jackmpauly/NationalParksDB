@@ -1,8 +1,14 @@
 import mysql.connector
 import csv
 
+def isNull(str):
+    if( str == "NULL" ):
+        # print("here")
+        return None
+    return int(str)
+
 def dropAllTables(mycursor):
-    # mycursor.execute("DROP TABLE park")
+    mycursor.execute("DROP TABLE park")
     mycursor.execute("DROP TABLE state_province")
     mycursor.execute("DROP TABLE country")
 
@@ -10,7 +16,7 @@ def init_country(mycursor):
     mycursor.execute(
         """CREATE TABLE country (
             id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-            name VARCHAR(50) NOT NULL DEFAULT 'Missing Name', 
+            name VARCHAR(50) NOT NULL UNIQUE DEFAULT 'Missing Name', 
             region VARCHAR(15) NOT NULL,
             CHECK(region IN ('Africa', 'Asia', 'Europe', 'Oceania', 'North America', 'South America'))
         )
@@ -28,9 +34,12 @@ def init_country(mycursor):
     for x in myresult:
         print(x)
 
-def insert_country(mycursor):
+def insert_country(mycursor, name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
-    
+    mycursor.execute(sql, (name, region) )
+
+def delete_country(mycursor):
+    print()
 
 def init_state_province(mycursor):
     mycursor.execute(
@@ -53,6 +62,60 @@ def init_state_province(mycursor):
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
+
+def is_duplicate_state_province(mycursor, name, country_id):
+    getcount = (
+        """SELECT COUNT(*) AS c FROM state_province
+            WHERE (name = %s) AND (country_id = %s)
+        """
+    )
+    mycursor.execute(getcount, (name, country_id) )
+
+    myresult = mycursor.fetchone()
+    if(myresult[0] == 1):
+        return True
+    else:
+        return False
+
+def insert_state_province(mycursor, name, country_id,):
+    dupe = is_duplicate_state_province(mycursor, name, country_id)
+
+    statement = "INSERT INTO state_province (name, country_id) VALUES (%s, %s)"
+    if(dupe):
+        print("duplicate")
+    else:
+        mycursor.execute(statement, (name, country_id) )
+        
+
+def update_state_province(mycursor, old_name, attr, val):
+    mycursor.execute(
+        """SELECT * FROM state_province
+            WHERE name = %s
+        """, (old_name,)
+    )
+    update_id = mycursor.fetchone()
+    id = update_id[0]
+    name = update_id[1]
+    country_id = update_id[2]
+
+    match attr:
+        case "name":
+            name = val;
+        case "country_id":
+            country_id = val;
+    
+    mycursor.execute("""UPDATE state_province SET name = %s, country_id = %s WHERE id = %s""", (name, country_id, id) )
+
+def delete_state_province(mycursor, name):
+    mycursor.execute(
+        """SELECT id FROM state_province
+            WHERE name = %s
+        """, (name,)
+    )
+    update_id = mycursor.fetchone()
+    id = update_id[0]
+
+    mycursor.execute("""DELETE FROM state_province WHERE id = %s""", (id,))
 
 def init_park(mycursor):
     mycursor.execute(
@@ -81,13 +144,6 @@ def init_park(mycursor):
     for x in myresult:
         print(x)
 
-def isNull(str):
-    if( str == "NULL" ):
-        # print("here")
-        return None
-    return int(str)
-
-
 def test(mycursor):
     mycursor.execute(
         """CREATE TABLE park (
@@ -113,21 +169,29 @@ def test(mycursor):
         print(x)
 
 
-def printAllTables(mycursor):
+def print_country(mycursor):
     print("COUNTRY")
     mycursor.execute("SELECT * FROM country")
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
-    
+
+def print_state_province(mycursor):
     print("STATE_PROVINCE")
     mycursor.execute("SELECT * FROM state_province")
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
 
+def print_park(mycursor):
     print("PARK")
     mycursor.execute("SELECT * FROM park")
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
+
+
+def print_all(mycursor):
+    print_country(mycursor)
+    print_state_province(mycursor)
+    print_park(mycursor)
