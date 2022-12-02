@@ -8,9 +8,9 @@ def isNull(str):
     return int(str)
 
 def dropAllTables(mycursor):
-    mycursor.execute("DROP TABLE park")
-    mycursor.execute("DROP TABLE state_province")
-    mycursor.execute("DROP TABLE country")
+    mycursor.execute("DROP TABLE IF EXISTS park")
+    mycursor.execute("DROP TABLE IF EXISTS state_province")
+    mycursor.execute("DROP TABLE IF EXISTS country")
 
 def init_country(mycursor):
     mycursor.execute(
@@ -23,7 +23,7 @@ def init_country(mycursor):
         """
     )
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
-    with open('CSVs/country.csv', newline='') as csvfile:
+    with open('CSVs/country.csv', newline='', encoding = 'utf-8') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
             mycursor.execute(sql, (f'{row[1]}', f'{row[2]}'))
@@ -52,7 +52,7 @@ def init_state_province(mycursor):
         """
     )
     sql = "INSERT INTO state_province (name, country_id) VALUES (%s, %s)"
-    with open('CSVs/state_province.csv', newline='') as csvfile:
+    with open('CSVs/state_province.csv', newline='', encoding = 'utf-8') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
             mycursor.execute(sql, (f'{row[1]}', f'{int(row[2])}') )
@@ -131,7 +131,7 @@ def init_park(mycursor):
         """
     )
     sql = "INSERT INTO park (name, visitors_per_year, state_province_id, area, year_established) VALUES (%s, %s, %s, %s, %s)"
-    with open('CSVs/park.csv', newline='') as csvfile:
+    with open('CSVs/park.csv', newline='', encoding = 'utf-8') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
             input = ( row[1], isNull(row[2]), isNull(row[3]), isNull(row[4]), isNull(row[5]) )
