@@ -8,6 +8,8 @@ def isNull(str):
     return int(str)
 
 def dropAllTables(mycursor):
+    mycursor.execute("DROP TABLE IF EXISTS trail")
+    mycursor.execute("DROP TABLE IF EXISTS mountain")
     mycursor.execute("DROP TABLE IF EXISTS lake")
     mycursor.execute("DROP TABLE IF EXISTS park")
     mycursor.execute("DROP TABLE IF EXISTS state_province")
@@ -196,6 +198,33 @@ def init_mountain(mycursor):
 
     # TODO: Verification Step - Delete Later
     mycursor.execute("SELECT * FROM mountain")
+    myresult = mycursor.fetchall()
+    for x in myresult:
+        print(x)
+
+# Create and initialize the trail table
+def init_trail(mycursor):
+    mycursor.execute(
+        """
+        CREATE TABLE trail (
+            id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL DEFAULT 'Missing Trail Name',
+            park_id INTEGER NOT NULL,
+            distance DECIMAL(6, 2),
+            FOREIGN KEY (park_id) REFERENCES park(id) ON DELETE CASCADE ON UPDATE CASCADE
+        )
+        """
+    )
+
+    sql = "INSERT INTO trail (name, park_id, distance) VALUES (%s, %s, %s)"
+    with open('CSVs/trail.csv', newline = '', encoding = 'utf-8') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter = ',')
+        for row in csv_reader:
+            input = ( row[1], isNull(row[2]), row[3] )
+            mycursor.execute(sql, input)
+
+    # TODO: Verification Step - Delete Later
+    mycursor.execute("SELECT * FROM trail")
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
