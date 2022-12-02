@@ -2,15 +2,16 @@ import mysql.connector
 import csv
 import tableManager
 
-def main():
-    mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "password",
-        database = "NationalParks"
-    )
+mydb = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "password",
+    database = "NationalParks"
+)
 
-    mycursor = mydb.cursor()
+mycursor = mydb.cursor()
+
+def main():
 
     # mycursor.execute("CREATE DATABASE NationalParks"))
 
@@ -48,4 +49,8 @@ def main():
     # for aggregate: how many national parks are in each country
 
 
-main()
+
+def init():
+    tableManager.init_park(mycursor)
+
+init()

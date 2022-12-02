@@ -169,29 +169,29 @@ def test(mycursor):
         print(x)
 
 
-def print_country(mycursor):
-    print("COUNTRY")
+def get_country(mycursor):
+    # print("COUNTRY")
     mycursor.execute("SELECT * FROM country")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
+    return mycursor.fetchall()
 
-def print_state_province(mycursor):
-    print("STATE_PROVINCE")
-    mycursor.execute("SELECT * FROM state_province")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
+def get_state_province(mycursor, param):
+    # print("STATE_PROVINCE")
+    print(param)
+    statement = "SELECT * FROM state_province WHERE name LIKE '%%%s%%'" % param
+    print(statement)
+    mycursor.execute(statement)
+    return mycursor.fetchall()
 
-def print_park(mycursor):
-    print("PARK")
+def get_park(mycursor):
+    # print("PARK")
     mycursor.execute("SELECT * FROM park")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
+    return mycursor.fetchall()
 
 
 def print_all(mycursor):
-    print_country(mycursor)
-    print_state_province(mycursor)
-    print_park(mycursor)
+    for x in get_country(mycursor):
+        print(x)
+    for x in get_state_province(mycursor, ""):
+        print(x)
+    for x in get_park(mycursor):
+        print(x)
