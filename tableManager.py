@@ -145,6 +145,7 @@ def init_park(mycursor):
     for x in myresult:
         print(x)
 
+# Create and initialize the lake table
 def init_lake(mycursor):
     mycursor.execute(
         """
@@ -168,6 +169,33 @@ def init_lake(mycursor):
     
     # TODO: Verification Step - Delete Later
     mycursor.execute("SELECT * FROM lake")
+    myresult = mycursor.fetchall()
+    for x in myresult:
+        print(x)
+
+# Create and initialize the mountain table
+def init_mountain(mycursor):
+    mycursor.execute(
+        """
+        CREATE TABLE mountain (
+            id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50) NOT NULL DEFAULT 'Missing Mountain Name',
+            park_id INTEGER NOT NULL,
+            elevation INTEGER NOT NULL,
+            FOREIGN KEY (park_id) REFERENCES park(id) ON DELETE CASCADE ON UPDATE CASCADE
+        )
+        """
+    )
+
+    sql = "INSERT INTO mountain (name, park_id, elevation) VALUES (%s, %s, %s)"
+    with open('CSVs/mountain.csv', newline = '', encoding = 'utf-8') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter = ',')
+        for row in csv_reader:
+            input = ( row[1], isNull(row[2]), isNull(row[3]) )
+            mycursor.execute(sql, input)
+
+    # TODO: Verification Step - Delete Later
+    mycursor.execute("SELECT * FROM mountain")
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
