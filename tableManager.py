@@ -8,6 +8,7 @@ def isNull(str):
     return int(str)
 
 def dropAllTables(mycursor):
+    mycursor.execute("DROP TABLE IF EXISTS lake")
     mycursor.execute("DROP TABLE IF EXISTS park")
     mycursor.execute("DROP TABLE IF EXISTS state_province")
     mycursor.execute("DROP TABLE IF EXISTS country")
@@ -140,6 +141,33 @@ def init_park(mycursor):
 
 
     mycursor.execute("SELECT * FROM park")
+    myresult = mycursor.fetchall()
+    for x in myresult:
+        print(x)
+
+def init_lake(mycursor):
+    mycursor.execute(
+        """
+        CREATE TABLE lake (
+            id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50) NOT NULL DEFAULT 'Missing Lake Name',
+            park_id INTEGER NOT NULL,
+            type VARCHAR(25),
+            depth INTEGER,
+            FOREIGN KEY (park_id) REFERENCES park(id) ON DELETE CASCADE ON UPDATE CASCADE
+        )
+        """
+    )
+
+    sql = "INSERT INTO lake (name, park_id, type, depth) VALUES (%s, %s, %s, %s)"
+    with open('CSVs/lake.csv', newline='', encoding = 'utf-8') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter = ',')
+        for row in csv_reader:
+            input = ( row[1], isNull(row[2]), row[3], isNull(row[4]) )
+            mycursor.execute(sql, input)
+    
+    # TODO: Verification Step - Delete Later
+    mycursor.execute("SELECT * FROM lake")
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
