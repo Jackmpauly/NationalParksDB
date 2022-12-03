@@ -65,3 +65,6 @@ def init_all():
 
 #init()
 init_all()
+
+tableManager.delete_country(mycursor, 'New Zealand')
+tableManager.print_all(mycursor)

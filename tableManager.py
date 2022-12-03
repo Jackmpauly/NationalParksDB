@@ -41,8 +41,17 @@ def insert_country(mycursor, name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
     mycursor.execute(sql, (name, region) )
 
-def delete_country(mycursor):
-    print()
+def delete_country(mycursor, name):
+    mycursor.execute("""SELECT id FROM country WHERE name = %s""", (name, ))
+
+    fetched_row = mycursor.fetchone()
+
+    if fetched_row == None:
+        print("No country exists with the name: " + name + ". Please enter a new country and try again.")
+        return
+
+    id_to_delete = fetched_row[0]
+    mycursor.execute("""DELETE FROM country WHERE id = %s""", (id_to_delete, ))
 
 def init_state_province(mycursor):
     mycursor.execute(
