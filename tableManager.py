@@ -374,6 +374,61 @@ def init_mountain(mycursor):
     for x in myresult:
         print(x)
 
+def insert_mountain(mycursor, name, park_id, elevation):
+    sql = "INSERT INTO mountain (name, park_id, elevation) VALUES (%s, %s, %s)"
+
+    try:
+        mycursor.execute(sql, (name, park_id, elevation))
+    # Invalid park_id throws IntegrityError
+    except mysql.connector.IntegrityError as park_id_error:
+        print("Unable to insert mountain: No park exists with id: " + str(park_id) + ". Please enter a different park_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def update_mountain(mycursor, name, attribute, new_value):
+    mycursor.execute("""SELECT * FROM mountain WHERE name = %s""", (name, ))
+
+    row_to_update = mycursor.fetchone()
+    if row_to_update == None:
+        print("Unable to update mountain: No mountian with the name " + name + " exists. Please enter a different mountain and try again.")
+        return
+
+    id, current_name, park_id, elevation = row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3]
+
+    match attribute:
+        case 'name':
+            current_name = new_value
+        case 'park_id':
+            park_id = new_value
+        case 'elevation':
+            elevation = new_value
+
+    try:
+        mycursor.execute(
+            """
+            UPDATE mountain
+            SET name = %s, park_id = %s, elevation = %s
+            WHERE id = %s
+            """,
+            (current_name, park_id, elevation, id)
+        )
+    # Thrown when attemtping to update park_id to an invalid park_id
+    except mysql.connector.IntegrityError as park_id_error:
+        print("Unable to update mountain: The given park_id: " + str(park_id) + " does not exist. Enter a different park_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def delete_mountain(mycursor, name):
+    mycursor.execute("""SELECT id FROM mountain WHERE name = %s""", (name, ))
+
+    fetched_row = mycursor.fetchone()
+    if fetched_row == None:
+        print("Unable to delete mountain: No mountain exists with the name: " + name + ". Please enter a different name and try again.")
+        return
+
+    id_to_delete = fetched_row[0]
+    mycursor.execute("""DELETE FROM mountain WHERE id = %s""", (id_to_delete, ))
+
 # Create and initialize the trail table
 def init_trail(mycursor):
     mycursor.execute(

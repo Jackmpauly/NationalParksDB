@@ -79,12 +79,20 @@ init_all()
 # tableManager.delete_park(mycursor, "Some Really Cool National Park")
 
 # Tests for Lake INSERT/UPDATE/DELETE
-tableManager.insert_lake(mycursor, 'Lake Tahoe', 33, 'Freshwater', 501)
-tableManager.update_lake(mycursor, 'Lake Tahoe', "name", 'Lake Smokin A Pack')
-tableManager.update_lake(mycursor, 'Lake Smokin A Pack', "park_id", 100)
-tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'park_id', 32)
-tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'type', 'Crater')
-tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'depth', 2)
-tableManager.delete_lake(mycursor, 'Lake Smokin A Pack')
+# tableManager.insert_lake(mycursor, 'Lake Tahoe', 33, 'Freshwater', 501)
+# tableManager.update_lake(mycursor, 'Lake Tahoe', "name", 'Lake Smokin A Pack')
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', "park_id", 100)
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'park_id', 32)
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'type', 'Crater')
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'depth', 2)
+# tableManager.delete_lake(mycursor, 'Lake Smokin A Pack')
+
+# Tests for Mountain INSERT/UPDATE/DELETE
+tableManager.insert_mountain(mycursor, 'Pompeii', 1, 1433)
+tableManager.update_mountain(mycursor, 'Pompeii', 'name', 'Mount Pauly')
+tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 99)
+tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 14)
+tableManager.update_mountain(mycursor, 'Mount Pauly', 'elevation', 9999)
+tableManager.delete_mountain(mycursor, 'Mount Pauly')
 
 tableManager.print_all(mycursor)
