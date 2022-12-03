@@ -53,4 +53,54 @@ def main():
 def init():
     tableManager.init_park(mycursor)
 
-init()
+def init_all():
+    tableManager.dropAllTables(mycursor)
+
+    tableManager.init_country(mycursor)
+    tableManager.init_state_province(mycursor)
+    tableManager.init_park(mycursor)
+    tableManager.init_lake(mycursor)
+    tableManager.init_mountain(mycursor)
+    tableManager.init_trail(mycursor)
+
+#init()
+init_all()
+
+# Test for Delete Country
+# tableManager.delete_country(mycursor, 'New Zealand')
+
+# Test for Update Country
+# tableManager.update_country(mycursor, 'Greece', 'name', 'Mozambique')
+# tableManager.update_country(mycursor, 'Mozambique', 'region', 'Africa')
+
+# Tests for Park INSERT/UPDATE/DELETE
+# tableManager.insert_park(mycursor, "Some Really Cool National Park", 85000, 45, "NULL", 1923)
+# tableManager.update_park(mycursor, "Some Really Cool National Park", "year_established", 2014)
+# tableManager.delete_park(mycursor, "Some Really Cool National Park")
+
+# Tests for Lake INSERT/UPDATE/DELETE
+# tableManager.insert_lake(mycursor, 'Lake Tahoe', 33, 'Freshwater', 501)
+# tableManager.update_lake(mycursor, 'Lake Tahoe', "name", 'Lake Smokin A Pack')
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', "park_id", 100)
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'park_id', 32)
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'type', 'Crater')
+# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'depth', 2)
+# tableManager.delete_lake(mycursor, 'Lake Smokin A Pack')
+
+# Tests for Mountain INSERT/UPDATE/DELETE
+# tableManager.insert_mountain(mycursor, 'Pompeii', 1, 1433)
+# tableManager.update_mountain(mycursor, 'Pompeii', 'name', 'Mount Pauly')
+# tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 99)
+# tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 14)
+# tableManager.update_mountain(mycursor, 'Mount Pauly', 'elevation', 9999)
+# tableManager.delete_mountain(mycursor, 'Mount Pauly')
+
+# Tests for Trail INSERT/UPDATE/DELETE
+tableManager.insert_trail(mycursor, 'Happy Trail', 23, 56.4)
+tableManager.update_trail(mycursor, 'Happy Trail', 'name', 'Sad Trail')
+tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 152)
+tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 22)
+tableManager.update_trail(mycursor, 'Sad Trail', 'distance', 49.21)
+tableManager.delete_trail(mycursor, 'Sad Trail')
+
+tableManager.print_all(mycursor)
