@@ -53,4 +53,15 @@ def main():
 def init():
     tableManager.init_park(mycursor)
 
-init()
+def init_all():
+    tableManager.dropAllTables(mycursor)
+
+    tableManager.init_country(mycursor)
+    tableManager.init_state_province(mycursor)
+    tableManager.init_park(mycursor)
+    tableManager.init_lake(mycursor)
+    tableManager.init_mountain(mycursor)
+    tableManager.init_trail(mycursor)
+
+#init()
+init_all()
