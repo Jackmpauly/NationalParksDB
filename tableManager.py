@@ -133,6 +133,10 @@ def update_state_province(mycursor, old_name, attr, val):
         """, (old_name,)
     )
     update_id = mycursor.fetchone()
+    if update_id == None:
+        print("There is no state/province with the name: " + old_name + ". Please enter a different name and try again.")
+        return
+
     id = update_id[0]
     name = update_id[1]
     country_id = update_id[2]
@@ -152,6 +156,10 @@ def delete_state_province(mycursor, name):
         """, (name,)
     )
     update_id = mycursor.fetchone()
+    if update_id == None:
+        print("There is no state/province with the name: " + name + ". Please enter a different name and try again.")
+        return
+
     id = update_id[0]
 
     mycursor.execute("""DELETE FROM state_province WHERE id = %s""", (id,))
