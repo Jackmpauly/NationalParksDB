@@ -66,5 +66,11 @@ def init_all():
 #init()
 init_all()
 
-tableManager.delete_country(mycursor, 'New Zealand')
+# Test for Delete Country
+# tableManager.delete_country(mycursor, 'New Zealand')
+# tableManager.print_all(mycursor)
+
+# Test for Update Country
+tableManager.update_country(mycursor, 'Greece', 'name', 'Mozambique')
+tableManager.update_country(mycursor, 'Mozambique', 'region', 'Africa')
 tableManager.print_all(mycursor)

@@ -41,6 +41,33 @@ def insert_country(mycursor, name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
     mycursor.execute(sql, (name, region) )
 
+def update_country(mycursor, name, attribute, new_value):
+    mycursor.execute("""SELECT * FROM country WHERE name = %s""", (name, ))
+
+    row_to_update = mycursor.fetchone()
+    if row_to_update == None:
+        print("No country exists with the name: " + name + ". Please enter a new country and try again")
+        return
+
+    id = row_to_update[0]
+    current_name = row_to_update[1]
+    region = row_to_update[2]
+
+    match attribute:
+        case 'name':
+            current_name = new_value
+        case 'region':
+            region = new_value
+
+    try:
+        mycursor.execute("""UPDATE country SET name = %s, region = %s WHERE id = %s""", (current_name, region, id))
+    # Duplicate name will throw IntegrityError thanks to UNIQUE constraint
+    except mysql.connector.IntegrityError as duplicate_error:
+        print("An entry with the name: " + current_name+ " already exists. Please enter a different country name and try again")
+    # CHECK for valid region will throw DatabaseError
+    except mysql.connector.DatabaseError as invalid_region_error:
+        print("An invalid region was entered as the updated region: " + region + "\nValid regions are: Africa, Asia, Europe, Ocenia, North America, South America")
+
 def delete_country(mycursor, name):
     mycursor.execute("""SELECT id FROM country WHERE name = %s""", (name, ))
 
