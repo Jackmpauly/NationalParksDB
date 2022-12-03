@@ -68,9 +68,14 @@ init_all()
 
 # Test for Delete Country
 # tableManager.delete_country(mycursor, 'New Zealand')
-# tableManager.print_all(mycursor)
 
 # Test for Update Country
-tableManager.update_country(mycursor, 'Greece', 'name', 'Mozambique')
-tableManager.update_country(mycursor, 'Mozambique', 'region', 'Africa')
+# tableManager.update_country(mycursor, 'Greece', 'name', 'Mozambique')
+# tableManager.update_country(mycursor, 'Mozambique', 'region', 'Africa')
+
+# Tests for Park INSERT/UPDATE/DELETE
+tableManager.insert_park(mycursor, "Some Really Cool National Park", 85000, 45, "NULL", 1923)
+tableManager.update_park(mycursor, "Some Really Cool National Park", "year_established", 2014)
+tableManager.delete_park(mycursor, "Some Really Cool National Park")
+
 tableManager.print_all(mycursor)

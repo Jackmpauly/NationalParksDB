@@ -46,7 +46,8 @@ def update_country(mycursor, name, attribute, new_value):
 
     row_to_update = mycursor.fetchone()
     if row_to_update == None:
-        print("No country exists with the name: " + name + ". Please enter a new country and try again")
+        print("Unable to update country: \
+            No country exists with the name: " + name + ". Please enter a new country and try again")
         return
 
     id = row_to_update[0]
@@ -74,7 +75,8 @@ def delete_country(mycursor, name):
     fetched_row = mycursor.fetchone()
 
     if fetched_row == None:
-        print("No country exists with the name: " + name + ". Please enter a new country and try again.")
+        print("Unable to delete country: \
+            No country exists with the name: " + name + ". Please enter a new country and try again.")
         return
 
     id_to_delete = fetched_row[0]
@@ -134,7 +136,8 @@ def update_state_province(mycursor, old_name, attr, val):
     )
     update_id = mycursor.fetchone()
     if update_id == None:
-        print("There is no state/province with the name: " + old_name + ". Please enter a different name and try again.")
+        print("Unable to update state/province: \
+            There is no state/province with the name: " + old_name + ". Please enter a different name and try again.")
         return
 
     id = update_id[0]
@@ -147,7 +150,13 @@ def update_state_province(mycursor, old_name, attr, val):
         case "country_id":
             country_id = val;
     
-    mycursor.execute("""UPDATE state_province SET name = %s, country_id = %s WHERE id = %s""", (name, country_id, id) )
+    try:
+        mycursor.execute("""UPDATE state_province SET name = %s, country_id = %s WHERE id = %s""", (name, country_id, id) )
+    except mysql.connector.IntegrityError as country_id_error:
+        print("Unable to update state/province: \
+            The given country_id " + str(country_id) + " does not exist. Please enter a different country_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
 
 def delete_state_province(mycursor, name):
     mycursor.execute(
@@ -157,7 +166,8 @@ def delete_state_province(mycursor, name):
     )
     update_id = mycursor.fetchone()
     if update_id == None:
-        print("There is no state/province with the name: " + name + ". Please enter a different name and try again.")
+        print("Unable to delete state/province: \
+            There is no state/province with the name: " + name + ". Please enter a different name and try again.")
         return
 
     id = update_id[0]
@@ -190,6 +200,67 @@ def init_park(mycursor):
     myresult = mycursor.fetchall()
     for x in myresult:
         print(x)
+
+def insert_park(mycursor, name, visitors_per_year, state_province_id, area, year_established):
+    sql = "INSERT INTO park (name, visitors_per_year, state_province_id, area, year_established) VALUES (%s, %s, %s, %s, %s)"
+    
+    try:
+        mycursor.execute(sql, (name, isNull(visitors_per_year), isNull(state_province_id), isNull(area), isNull(year_established)))
+    except mysql.connector.IntegrityError as sp_id_error:
+        print("Unable to add park: \
+            The given state/province id " + str(state_province_id) + " does not exist. Please enter a new state/province id and try agian")
+    except mysql.connector.Error as error:
+        print("Something went wrong. {}".format(error))
+
+def update_park(mycursor, name, attribute, new_value):
+    mycursor.execute("""SELECT * FROM park WHERE name = %s""", (name,))
+
+    row_to_update = mycursor.fetchone()
+    if row_to_update == None:
+        print("Unable to update park: No park with the name " + name + " exists. Please enter a different park and try again.")
+        return
+    
+    id, current_name, visitors_per_year, sp_id, area, year_established = \
+        row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3], row_to_update[4], row_to_update[5]
+
+    match attribute:
+        case 'name':
+            current_name = new_value
+        case 'visitors_per_year':
+            visitors_per_year = new_value
+        case 'state_province_id':
+            sp_id = new_value
+        case 'area':
+            area = new_value
+        case 'year_established':
+            year_established = new_value
+
+    try:
+        mycursor.execute(
+            """
+            UPDATE park
+            SET name = %s, visitors_per_year = %s, state_province_id = %s, area = %s, year_established = %s
+            WHERE id = %s
+            """,
+            (current_name, visitors_per_year, sp_id, area, year_established, id)
+        )
+    # Thrown when attempting to update SP_ID to an invalid SP_ID
+    except mysql.connector.IntegrityError as sp_id_error:
+        print("Unable to update park: The given state_province_id: " + str(sp_id) + " does not exist. Enter a different state_province_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def delete_park(mycursor, name):
+    mycursor.execute("""SELECT id FROM park WHERE name = %s""", (name, ))
+
+    fetched_row = mycursor.fetchone()
+
+    if fetched_row == None:
+        print("Unable to delete park: No country exists with the name: " + name + ". Please enter a different name and try again.")
+        return
+
+    id_to_delete = fetched_row[0]
+    mycursor.execute("""DELETE FROM park WHERE id = %s""", (id_to_delete, ))
 
 # Create and initialize the lake table
 def init_lake(mycursor):
