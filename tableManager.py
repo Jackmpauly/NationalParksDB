@@ -290,6 +290,63 @@ def init_lake(mycursor):
     for x in myresult:
         print(x)
 
+def insert_lake(mycursor, name, park_id, type, depth):
+    sql = "INSERT INTO lake (name, park_id, type, depth) VALUES (%s, %s, %s, %s)"
+
+    try:
+        mycursor.execute(sql, (name, isNull(park_id), type, isNull(depth)))
+    # Invalid park_id throws IntegrityError
+    except mysql.connector.IntegrityError as park_id_error:
+        print("Unable to insert lake: No park exists with id: " + str(park_id) + ". Please enter a different park_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def update_lake(mycursor, name, attribute, new_value):
+    mycursor.execute("""SELECT * FROM lake WHERE name = %s""", (name,))
+
+    row_to_update = mycursor.fetchone()
+    if row_to_update == None:
+        print("Unable to update lake: No lake with the name " + name + " exists. Please enter a different lake and try again.")
+        return
+
+    id, current_name, park_id, type, depth = row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3], row_to_update[4]
+
+    match attribute:
+        case 'name':
+            current_name = new_value
+        case 'park_id':
+            park_id = new_value
+        case 'type':
+            type = new_value
+        case 'depth':
+            depth = new_value
+
+    try:
+        mycursor.execute(
+            """
+            UPDATE lake
+            SET name = %s, park_id = %s, type = %s, depth = %s
+            WHERE id = %s
+            """,
+            (current_name, park_id, type, depth, id)
+        )
+    # Thrown when attempting to update park_id to an invalid park_id
+    except mysql.connector.IntegrityError as park_id_error:
+        print("Unable to update lake: The given park_id: " + str(park_id) + " does not exist. Enter a different park_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def delete_lake(mycursor, name):
+    mycursor.execute("""SELECT id FROM lake where name = %s""", (name, ))
+
+    fetched_row = mycursor.fetchone()
+    if fetched_row == None:
+        print("Unable to delete lake: No lake exists with the name: " + name + ". Please enter a different name and try again.")
+        return
+
+    id_to_delete = fetched_row[0]
+    mycursor.execute("""DELETE FROM lake WHERE id = %s""", (id_to_delete, ))
+
 # Create and initialize the mountain table
 def init_mountain(mycursor):
     mycursor.execute(
@@ -387,6 +444,17 @@ def get_park(mycursor):
     mycursor.execute("SELECT * FROM park")
     return mycursor.fetchall()
 
+def get_lake(mycursor):
+    mycursor.execute("SELECT * FROM lake")
+    return mycursor.fetchall()
+
+def get_mountain(mycursor):
+    mycursor.execute("SELECT * FROM mountain")
+    return mycursor.fetchall()
+
+def get_trail(mycursor):
+    mycursor.execute("SELECT * FROM trail")
+    return mycursor.fetchall()
 
 def print_all(mycursor):
     for x in get_country(mycursor):
@@ -394,4 +462,10 @@ def print_all(mycursor):
     for x in get_state_province(mycursor, ""):
         print(x)
     for x in get_park(mycursor):
+        print(x)
+    for x in get_lake(mycursor):
+        print(x)
+    for x in get_mountain(mycursor):
+        print(x)
+    for x in get_trail(mycursor):
         print(x)

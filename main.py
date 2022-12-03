@@ -74,8 +74,17 @@ init_all()
 # tableManager.update_country(mycursor, 'Mozambique', 'region', 'Africa')
 
 # Tests for Park INSERT/UPDATE/DELETE
-tableManager.insert_park(mycursor, "Some Really Cool National Park", 85000, 45, "NULL", 1923)
-tableManager.update_park(mycursor, "Some Really Cool National Park", "year_established", 2014)
-tableManager.delete_park(mycursor, "Some Really Cool National Park")
+# tableManager.insert_park(mycursor, "Some Really Cool National Park", 85000, 45, "NULL", 1923)
+# tableManager.update_park(mycursor, "Some Really Cool National Park", "year_established", 2014)
+# tableManager.delete_park(mycursor, "Some Really Cool National Park")
+
+# Tests for Lake INSERT/UPDATE/DELETE
+tableManager.insert_lake(mycursor, 'Lake Tahoe', 33, 'Freshwater', 501)
+tableManager.update_lake(mycursor, 'Lake Tahoe', "name", 'Lake Smokin A Pack')
+tableManager.update_lake(mycursor, 'Lake Smokin A Pack', "park_id", 100)
+tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'park_id', 32)
+tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'type', 'Crater')
+tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'depth', 2)
+tableManager.delete_lake(mycursor, 'Lake Smokin A Pack')
 
 tableManager.print_all(mycursor)
