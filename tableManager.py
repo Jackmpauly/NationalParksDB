@@ -456,6 +456,60 @@ def init_trail(mycursor):
     for x in myresult:
         print(x)
 
+def insert_trail(mycursor, name, park_id, distance):
+    sql = "INSERT INTO trail (name, park_id, distance) VALUES (%s, %s, %s)"
+
+    try:
+        mycursor.execute(sql, (name, park_id, distance))
+    # Invalid park_id throws IntegrityError
+    except mysql.connector.IntegrityError as park_id_error:
+        print("Unable to insert trail: No park exists with id: " + str(park_id) + ". Please enter a different park_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def update_trail(mycursor, name, attribute, new_value):
+    mycursor.execute("""SELECT * FROM trail WHERE name = %s""", (name, ))
+
+    row_to_update = mycursor.fetchone()
+    if row_to_update == None:
+        print("Unable to update trail: No trail with the name " + name + " exists. Please enter a different trail and try again.")
+        return
+
+    id, current_name, park_id, distance = row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3]
+
+    match attribute:
+        case 'name':
+            current_name = new_value
+        case 'park_id':
+            park_id = new_value
+        case 'distance':
+            distance = new_value
+
+    try:
+        mycursor.execute(
+            """
+            UPDATE trail
+            SET name = %s, park_id = %s, distance = %s
+            WHERE id = %s
+            """,
+            (current_name, park_id, distance, id)
+        )
+    except mysql.connector.IntegrityError as park_id_error:
+        print("Unable to update trail: The given park_id: " + str(park_id) + " does not exist. Enter a different park_id and try again.")
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+def delete_trail(mycursor, name):
+    mycursor.execute("""SELECT id FROM trail WHERE name = %s""", (name, ))
+
+    fetched_row = mycursor.fetchone()
+    if fetched_row == None:
+        print("Unable to delete trail: No trail exists with the name: " + name + ". Please tner a different name and try again.")
+        return
+
+    id_to_delete = fetched_row[0]
+    mycursor.execute("""DELETE FROM trail WHERE id = %s""", (id_to_delete, ))
+
 def test(mycursor):
     mycursor.execute(
         """CREATE TABLE park (

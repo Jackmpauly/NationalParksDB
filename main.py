@@ -88,11 +88,19 @@ init_all()
 # tableManager.delete_lake(mycursor, 'Lake Smokin A Pack')
 
 # Tests for Mountain INSERT/UPDATE/DELETE
-tableManager.insert_mountain(mycursor, 'Pompeii', 1, 1433)
-tableManager.update_mountain(mycursor, 'Pompeii', 'name', 'Mount Pauly')
-tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 99)
-tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 14)
-tableManager.update_mountain(mycursor, 'Mount Pauly', 'elevation', 9999)
-tableManager.delete_mountain(mycursor, 'Mount Pauly')
+# tableManager.insert_mountain(mycursor, 'Pompeii', 1, 1433)
+# tableManager.update_mountain(mycursor, 'Pompeii', 'name', 'Mount Pauly')
+# tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 99)
+# tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 14)
+# tableManager.update_mountain(mycursor, 'Mount Pauly', 'elevation', 9999)
+# tableManager.delete_mountain(mycursor, 'Mount Pauly')
+
+# Tests for Trail INSERT/UPDATE/DELETE
+tableManager.insert_trail(mycursor, 'Happy Trail', 23, 56.4)
+tableManager.update_trail(mycursor, 'Happy Trail', 'name', 'Sad Trail')
+tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 152)
+tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 22)
+tableManager.update_trail(mycursor, 'Sad Trail', 'distance', 49.21)
+tableManager.delete_trail(mycursor, 'Sad Trail')
 
 tableManager.print_all(mycursor)
