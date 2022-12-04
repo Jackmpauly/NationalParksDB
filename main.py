@@ -2,6 +2,8 @@ import mysql.connector
 import csv
 import tableManager
 
+import pandas as pd
+
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "root",
@@ -63,6 +65,9 @@ def init_all():
     tableManager.init_mountain(mycursor)
     tableManager.init_trail(mycursor)
 
+    # Commit changes to database
+    mydb.commit()
+
 #init()
 init_all()
 
@@ -96,11 +101,11 @@ init_all()
 # tableManager.delete_mountain(mycursor, 'Mount Pauly')
 
 # Tests for Trail INSERT/UPDATE/DELETE
-tableManager.insert_trail(mycursor, 'Happy Trail', 23, 56.4)
-tableManager.update_trail(mycursor, 'Happy Trail', 'name', 'Sad Trail')
-tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 152)
-tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 22)
-tableManager.update_trail(mycursor, 'Sad Trail', 'distance', 49.21)
-tableManager.delete_trail(mycursor, 'Sad Trail')
+# tableManager.insert_trail(mycursor, 'Happy Trail', 23, 56.4)
+# tableManager.update_trail(mycursor, 'Happy Trail', 'name', 'Sad Trail')
+# tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 152)
+# tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 22)
+# tableManager.update_trail(mycursor, 'Sad Trail', 'distance', 49.21)
+# tableManager.delete_trail(mycursor, 'Sad Trail')
 
 tableManager.print_all(mycursor)

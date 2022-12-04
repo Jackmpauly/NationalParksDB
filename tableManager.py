@@ -535,9 +535,10 @@ def test(mycursor):
         print(x)
 
 
-def get_country(mycursor):
+def get_country(mycursor, param):
     # print("COUNTRY")
-    mycursor.execute("SELECT * FROM country")
+    sql = "SELECT * FROM country WHERE name LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_state_province(mycursor, param):
@@ -548,33 +549,38 @@ def get_state_province(mycursor, param):
     mycursor.execute(statement)
     return mycursor.fetchall()
 
-def get_park(mycursor):
+def get_park(mycursor, param):
     # print("PARK")
-    mycursor.execute("SELECT * FROM park")
+    sql = "SELECT * FROM park WHERE name LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_lake(mycursor):
-    mycursor.execute("SELECT * FROM lake")
+def get_lake(mycursor, param):
+    sql = "SELECT * FROM lake WHERE name LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_mountain(mycursor):
-    mycursor.execute("SELECT * FROM mountain")
+def get_mountain(mycursor, param):
+    sql = "SELECT * FROM mountain WHERE name LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_trail(mycursor):
-    mycursor.execute("SELECT * FROM trail")
+# TODO: FOR SOME REASON THIS AIN'T WORKING
+def get_trail(mycursor, param):
+    sql = "SELECT * FROM trail WHERE name LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def print_all(mycursor):
-    for x in get_country(mycursor):
+    for x in get_country(mycursor, ""):
         print(x)
     for x in get_state_province(mycursor, ""):
         print(x)
-    for x in get_park(mycursor):
+    for x in get_park(mycursor, ""):
         print(x)
-    for x in get_lake(mycursor):
+    for x in get_lake(mycursor, ""):
         print(x)
-    for x in get_mountain(mycursor):
+    for x in get_mountain(mycursor, ""):
         print(x)
-    for x in get_trail(mycursor):
+    for x in get_trail(mycursor, ""):
         print(x)

@@ -34,7 +34,7 @@ def gen_sp_dataframe(searchterm):
 
     # loop through the state_province table and create rows, then enter them into the dataframe
     for x in tm.get_state_province(mycursor, searchterm):
-        row = pd.DataFrame({ 'ID':x[0], 'Name':x[1], 'Country ID':x[2] }, index=[0])
+        row = pd.DataFrame({ 'ID':str(x[0]), 'Name':x[1], 'Country ID':str(x[2]) }, index=[0])
         df = pd.concat([df.loc[:], row]).reset_index(drop=True)
 
 
