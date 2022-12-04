@@ -65,6 +65,9 @@ def init_all():
     tableManager.init_mountain(mycursor)
     tableManager.init_trail(mycursor)
 
+    # Commit changes to database
+    mydb.commit()
+
 #init()
 init_all()
 
@@ -106,23 +109,3 @@ init_all()
 # tableManager.delete_trail(mycursor, 'Sad Trail')
 
 tableManager.print_all(mycursor)
-
-# TODO: WORKS IN CONSOLE BUT NOT IN STREAMLIT
-def gen_trail_dataframe(searchterm):
-    # Empty dictionary to be drawn in the table
-    dict = {
-        'ID':[],
-        'Name':[],
-        'Park ID':[],
-        'Distance':[]
-    }
-
-    df = pd.DataFrame(dict)
-
-    for trail in tableManager.get_trail(mycursor, searchterm):
-        row = pd.DataFrame({'ID':trail[0], 'Name':trail[1], 'Park ID':trail[2], 'Distance':str(trail[3])}, index = [0])
-        df = pd.concat([df.loc[:], row]).reset_index(drop = True)
-    
-    return df
-
-print(gen_trail_dataframe(""))
