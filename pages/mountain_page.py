@@ -26,9 +26,11 @@ def gen_mountain_dataframe(searchterm):
     df = pd.DataFrame(dict)
 
     for mountain in tm.get_mountain(mycursor, searchterm):
-        row = pd.DataFrame({'ID':mountain[0], 'Name':mountain[1], 'Park ID':mountain[2], 'Elevation':mountain[3]}, index = [0])
+        row = pd.DataFrame({'ID':str(mountain[0]), 'Name':mountain[1], 'Park ID':str(mountain[2]), 'Elevation':str(mountain[3])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
+    df.set_axis(['ID', 'Name', 'Park ID', 'Elevation (m)'], axis = 'columns', inplace = True)
+
     return df
 
 def draw_textbox():

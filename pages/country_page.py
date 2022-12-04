@@ -25,7 +25,7 @@ def gen_country_dataframe(searchterm):
     df = pd.DataFrame(dict)
 
     for country in tm.get_country(mycursor, searchterm):
-        row = pd.DataFrame({'ID':country[0], 'Name':country[1], 'Region':country[2]}, index = [0])
+        row = pd.DataFrame({'ID':str(country[0]), 'Name':country[1], 'Region':country[2]}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
     return df

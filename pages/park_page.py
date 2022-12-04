@@ -28,10 +28,12 @@ def gen_park_dataframe(searchterm):
     df = pd.DataFrame(dict)
 
     for park in tm.get_park(mycursor, searchterm):
-        row = pd.DataFrame({'ID':park[0], 'Name':park[1], 'Visitors Per Year':park[2], 'State_Province ID':park[3],
-             'Area':park[4], 'Year Established':park[5]}, index = [0])
+        row = pd.DataFrame({'ID':str(park[0]), 'Name':park[1], 'Visitors Per Year':park[2], 'State_Province ID':str(park[3]),
+             'Area':str(park[4]), 'Year Established':str(park[5])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
+    df.set_axis(['ID', 'Name', 'Visitors Per Year', 'State_Province ID', 'Area (km sqd)', 'Year Established'], axis = 'columns', inplace = True)
+
     return df
 
 def draw_textbox():

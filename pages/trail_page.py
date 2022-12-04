@@ -29,9 +29,11 @@ def gen_trail_dataframe(searchterm):
     print(tm.get_trail(mycursor, ''))
     for trail in tm.get_trail(mycursor, searchterm):
         print(trail[0])
-        row = pd.DataFrame({'ID':trail[0], 'Name':trail[1], 'Park ID':trail[2], 'Distance':str(trail[3])}, index = [0])
+        row = pd.DataFrame({'ID':str(trail[0]), 'Name':trail[1], 'Park ID':str(trail[2]), 'Distance':str(trail[3])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
+    df.set_axis(['ID', 'Name', 'Park ID', 'Distance (km)'], axis = 'columns', inplace = True)
+
     return df
 
 def draw_textbox():

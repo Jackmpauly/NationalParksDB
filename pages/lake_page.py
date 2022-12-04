@@ -27,10 +27,12 @@ def gen_lake_dataframe(searchterm):
     df = pd.DataFrame(dict)
 
     for lake in tm.get_lake(mycursor, searchterm):
-        row = pd.DataFrame({'ID':lake[0], 'Name':lake[1], 'Park ID':lake[2], 'Type':lake[3], \
-             'Depth (Meters)':lake[4]}, index = [0])
+        row = pd.DataFrame({'ID':str(lake[0]), 'Name':lake[1], 'Park ID':str(lake[2]), 'Type':lake[3], \
+             'Depth':str(lake[4])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
+    df.set_axis(['ID', 'Name', 'Park ID', 'Type', 'Depth (m)'], axis = 'columns', inplace = True)
+
     return df
 
 def draw_textbox():
