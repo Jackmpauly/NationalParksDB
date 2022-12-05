@@ -118,7 +118,7 @@ def is_duplicate_state_province(mycursor, name, country_id):
     else:
         return False
 
-def insert_state_province(mycursor, name, country_id,):
+def insert_state_province(mycursor, name, country_id):
     dupe = is_duplicate_state_province(mycursor, name, country_id)
 
     statement = "INSERT INTO state_province (name, country_id) VALUES (%s, %s)"
