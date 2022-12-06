@@ -61,9 +61,9 @@ def update_country(mycursor, name, attribute, new_value):
     region = row_to_update[2]
 
     match attribute:
-        case 'name':
+        case 'Name':
             current_name = new_value
-        case 'region':
+        case 'Region':
             region = new_value
 
     try:
@@ -153,7 +153,7 @@ def update_state_province(mycursor, old_name, attr, val):
     match attr:
         case "Name":
             name = val;
-        case "Country ID":
+        case "Country":
             country_id = val;
     
     try:

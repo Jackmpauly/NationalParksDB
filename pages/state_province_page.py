@@ -3,7 +3,6 @@ import mysql.connector
 import streamlit as st
 import pandas as pd
 import tableManager as tm
-import streamlit_app as sta
 
 import pages.country_page as cp
 
@@ -17,6 +16,7 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 sp_dataframe = None
+country_dataframe = None
 
 def gen_sp_dataframe(searchterm):
     # create the empty dict (to be drawn in the table)
@@ -39,63 +39,63 @@ def gen_sp_dataframe(searchterm):
     return df
 
 def draw_textbox():
-    st.write('SEARCH')
-    name = st.text_input('State/Province', '')
+    name = st.text_input('State/Province', '', key="sp_drawTextBox")
     st.write('Searching for ', name)
     global sp_dataframe
     sp_dataframe = gen_sp_dataframe(name)
 
 def modify():
-
+    global sp_dataframe
     page_names = ['Update', 'Add', 'Delete']
-    page = st.radio('Choose one', page_names)
+    page = st.radio('Choose one', page_names, key="sp_selection")
     st.write('You selected:', page)
 
     if page == 'Update':
-        global sp_dataframe
-        tempdf = sp_dataframe.sort_values(by=['Name'])
-        spName = st.selectbox('Select a Province to Modify',
-            tempdf['Name'])
-        # Get info about current state/province. Set the new name and country id to the old name and country id
-        new_name = spName
-        mycursor.execute("""SELECT country_id FROM state_province WHERE name = %s""", (spName, ))
-        new_country_id = mycursor.fetchone()
-
-
-        attr = st.radio('Select an attribute to modify',
-            list(sp_dataframe.columns.values)[1:])
-        if attr == 'Name':
-            new_name = st.text_input('Enter new Name')
-        elif attr == 'Country ID':
-            new_country = st.selectbox('Select country:',
-                list(cp.gen_country_dataframe("").loc()[:,'Name']))
-            mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
-            new_country_id = mycursor.fetchone()[0]
-        
-        if(st.button('Update')):
-            tm.update_state_province(mycursor, new_name, attr, new_country_id)
-            mydb.commit()
-
-
+        update()
     elif page == 'Add':
-        new_name = st.text_input('Enter State/Province name:')
-        new_country = st.selectbox('Select country:',
-            list(cp.gen_country_dataframe("").loc()[:,'Name']))
-        mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
-        new_country_id = mycursor.fetchone()[0]
-        if(st.button('Add')):
-            tm.insert_state_province(mycursor, new_name, new_country_id)
-            mydb.commit()
+        add()
     elif page == 'Delete':
-        tempdf = sp_dataframe.sort_values(by=['Name'])
-        spName = st.selectbox('Select a Province to Delete',
-            tempdf['Name'])
-        if(st.button('Delete')):
-            tm.delete_state_province(mycursor, spName)
-            mydb.commit()
+        delete()
 
     sp_dataframe = gen_sp_dataframe('')
 
+def update():
+    tempdf = sp_dataframe.sort_values(by=['Name'])
+    # Get info about current state/province. Set the new name and country id to the old name and country id
+    name = st.selectbox('Select a Province to Modify',
+        tempdf['Name'])
+
+    attr = st.radio('Select an attribute to modify',
+        list(sp_dataframe.columns.values)[1:], key="sp_attr")
+    if attr == 'Name':
+        newAttr = st.text_input('Enter new Name', key="sp_new_name")
+    elif attr == 'Country':
+        new_country = st.selectbox('Select country:',
+            list(country_dataframe.loc()[:,'Name']))
+        mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
+        newAttr = mycursor.fetchone()[0]
+    
+    if(st.button('Update', key="sp_update_button")):
+        tm.update_state_province(mycursor, name, attr, newAttr)
+        mydb.commit()
+
+def add():
+    new_name = st.text_input('Enter State/Province name:', key="sp_new_name2")
+    new_country = st.selectbox('Select country:',
+        list(country_dataframe.loc()[:,'Name']))
+    mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
+    new_country_id = mycursor.fetchone()[0]
+    if(st.button('Add', key="sp_add_button")):
+        tm.insert_state_province(mycursor, new_name, new_country_id)
+        mydb.commit()
+
+def delete():
+    tempdf = sp_dataframe.sort_values(by=['Name'])
+    name = st.selectbox('Select a Province to Delete',
+        tempdf['Name'])
+    if(st.button('Delete', key="sp_delete_button")):
+        tm.delete_state_province(mycursor, name)
+        mydb.commit()
 
 def main():
     print("reset")
@@ -104,7 +104,12 @@ def main():
 
     global sp_dataframe
     sp_dataframe = gen_sp_dataframe('')    
-    
+
+    global country_dataframe
+    country_dataframe = cp.gen_country_dataframe('')
+
+    for x in tm.get_country(mycursor, ""):
+        print(x)
     modify()
     draw_textbox()
     st.table(sp_dataframe)
