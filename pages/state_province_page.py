@@ -86,10 +86,15 @@ def modify():
         if(st.button('Add')):
             tm.insert_state_province(mycursor, new_name, new_country_id)
             mydb.commit()
+    elif page == 'Delete':
+        tempdf = sp_dataframe.sort_values(by=['Name'])
+        spName = st.selectbox('Select a Province to Delete',
+            tempdf['Name'])
+        if(st.button('Delete')):
+            tm.delete_state_province(mycursor, spName)
+            mydb.commit()
 
     sp_dataframe = gen_sp_dataframe('')
-    for x in tm.get_state_province(mycursor, ""):
-        print(x)
 
 
 def main():
