@@ -39,23 +39,23 @@ def gen_sp_dataframe(searchterm):
     return df
 
 def draw_textbox():
+    st.write('SEARCH')
     name = st.text_input('State/Province', '')
     st.write('Searching for ', name)
     global sp_dataframe
     sp_dataframe = gen_sp_dataframe(name)
 
 def modify():
-    global sp_dataframe
-
-    tempdf = sp_dataframe.sort_values(by=['Name'])
-    option = st.selectbox('Select a Province to Modify',
-        tempdf['Name'])
 
     page_names = ['Update', 'Add', 'Delete']
     page = st.radio('Choose one', page_names)
     st.write('You selected:', page)
 
     if page == 'Update':
+        global sp_dataframe
+        tempdf = sp_dataframe.sort_values(by=['Name'])
+        option = st.selectbox('Select a Province to Modify',
+            tempdf['Name'])
         attr_option = st.selectbox('Select an attribute to modify',
             list(sp_dataframe.columns.values)[1:])
         new_name = st.text_input('Enter new ' + attr_option)
@@ -69,16 +69,19 @@ def modify():
             tm.insert_state_province(mycursor, new_name, new_country_id)
             mydb.commit()
 
+    sp_dataframe = gen_sp_dataframe('')
+
 
 def main():
     print("reset")
     # writing simple text
     # st.text("Hello")
-    draw_textbox()
 
-    
+    global sp_dataframe
+    sp_dataframe = gen_sp_dataframe('')    
     
     modify()
+    draw_textbox()
     st.table(sp_dataframe)
 
     # st.table(cp.gen_country_dataframe(""))

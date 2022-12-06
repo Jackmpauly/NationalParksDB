@@ -26,9 +26,7 @@ def gen_trail_dataframe(searchterm):
 
     df = pd.DataFrame(dict)
 
-    print(tm.get_trail(mycursor, ''))
     for trail in tm.get_trail(mycursor, searchterm):
-        print(trail[0])
         row = pd.DataFrame({'ID':str(trail[0]), 'Name':trail[1], 'Park ID':str(trail[2]), 'Distance':str(trail[3])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     

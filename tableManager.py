@@ -543,10 +543,8 @@ def get_country(mycursor, param):
 
 def get_state_province(mycursor, param):
     # print("STATE_PROVINCE")
-    print(param)
-    statement = "SELECT * FROM state_province WHERE name LIKE '%%%s%%'" % param
-    print(statement)
-    mycursor.execute(statement)
+    sql = "SELECT * FROM state_province WHERE name LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_park(mycursor, param):

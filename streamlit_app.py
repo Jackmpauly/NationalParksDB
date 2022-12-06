@@ -99,12 +99,6 @@ def main():
     print("reset")
     # writing simple text
     # st.text("Hello")
-    getAllDataframes()
-
-    draw_textbox()
-    modify()
-
-    st.table(sp_dataframe)
 
 
 st.text('Hello')
