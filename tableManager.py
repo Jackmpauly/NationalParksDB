@@ -39,7 +39,13 @@ def init_country(mycursor):
 
 def insert_country(mycursor, name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
-    mycursor.execute(sql, (name, region) )
+
+    try:
+        mycursor.execute(sql, (name, region) )
+    except mysql.connector.IntegrityError as duplicate_error:
+        print("An entry with the name: " + name + " already exists.")
+    except mysql.connector.DatabaseError as invalid_region_error:
+        print("An invalid region was entered: " + region)
 
 def update_country(mycursor, name, attribute, new_value):
     mycursor.execute("""SELECT * FROM country WHERE name = %s""", (name, ))
