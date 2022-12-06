@@ -33,7 +33,7 @@ def gen_sp_dataframe(searchterm):
         df = pd.concat([df.loc[:], row]).reset_index(drop=True)
 
 
-    df.set_axis(['ID', 'Name', 'Country ID'], axis = 'columns', inplace = True)
+    df.set_axis(['ID', 'Name', 'Country ID'], axis = 'columns', copy = False)
     
     # return the dataframe
     return df
@@ -54,11 +54,29 @@ def modify():
     if page == 'Update':
         global sp_dataframe
         tempdf = sp_dataframe.sort_values(by=['Name'])
-        option = st.selectbox('Select a Province to Modify',
+        spName = st.selectbox('Select a Province to Modify',
             tempdf['Name'])
-        attr_option = st.selectbox('Select an attribute to modify',
+        # Get info about current state/province. Set the new name and country id to the old name and country id
+        new_name = spName
+        mycursor.execute("""SELECT country_id FROM state_province WHERE name = %s""", (spName, ))
+        new_country_id = mycursor.fetchone()
+
+
+        attr = st.radio('Select an attribute to modify',
             list(sp_dataframe.columns.values)[1:])
-        new_name = st.text_input('Enter new ' + attr_option)
+        if attr == 'Name':
+            new_name = st.text_input('Enter new Name')
+        elif attr == 'Country ID':
+            new_country = st.selectbox('Select country:',
+                list(cp.gen_country_dataframe("").loc()[:,'Name']))
+            mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
+            new_country_id = mycursor.fetchone()[0]
+        
+        if(st.button('Update')):
+            tm.update_state_province(mycursor, new_name, attr, new_country_id)
+            mydb.commit()
+
+
     elif page == 'Add':
         new_name = st.text_input('Enter State/Province name:')
         new_country = st.selectbox('Select country:',
@@ -70,6 +88,8 @@ def modify():
             mydb.commit()
 
     sp_dataframe = gen_sp_dataframe('')
+    for x in tm.get_state_province(mycursor, ""):
+        print(x)
 
 
 def main():

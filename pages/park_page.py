@@ -32,7 +32,7 @@ def gen_park_dataframe(searchterm):
              'Area':str(park[4]), 'Year Established':str(park[5])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
-    df.set_axis(['ID', 'Name', 'Visitors Per Year', 'State_Province ID', 'Area (km sqd)', 'Year Established'], axis = 'columns', inplace = True)
+    df.set_axis(['ID', 'Name', 'Visitors Per Year', 'State_Province ID', 'Area (km sqd)', 'Year Established'], axis = 'columns', copy = False)
 
     return df
 

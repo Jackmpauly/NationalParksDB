@@ -31,7 +31,7 @@ def gen_lake_dataframe(searchterm):
              'Depth':str(lake[4])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
-    df.set_axis(['ID', 'Name', 'Park ID', 'Type', 'Depth (m)'], axis = 'columns', inplace = True)
+    df.set_axis(['ID', 'Name', 'Park ID', 'Type', 'Depth (m)'], axis = 'columns', copy = False)
 
     return df
 

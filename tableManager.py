@@ -151,9 +151,9 @@ def update_state_province(mycursor, old_name, attr, val):
     country_id = update_id[2]
 
     match attr:
-        case "name":
+        case "Name":
             name = val;
-        case "country_id":
+        case "Country ID":
             country_id = val;
     
     try:
