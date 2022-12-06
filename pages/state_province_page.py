@@ -23,17 +23,17 @@ def gen_sp_dataframe(searchterm):
     dict = {
         'ID':[],
         'Name':[],
-        'Country ID':[]
+        'Country':[]
     }
     df = pd.DataFrame(dict)
 
     # loop through the state_province table and create rows, then enter them into the dataframe
     for x in tm.get_state_province(mycursor, searchterm):
-        row = pd.DataFrame({ 'ID':str(x[0]), 'Name':x[1], 'Country ID':str(x[2]) }, index=[0])
+        row = pd.DataFrame({ 'ID':str(x[0]), 'Name':x[1], 'Country':str(x[2]) }, index=[0])
         df = pd.concat([df.loc[:], row]).reset_index(drop=True)
 
 
-    df.set_axis(['ID', 'Name', 'Country ID'], axis = 'columns', copy = False)
+    df.set_axis(['ID', 'Name', 'Country'], axis = 'columns', copy = False)
     
     # return the dataframe
     return df

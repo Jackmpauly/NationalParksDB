@@ -549,7 +549,8 @@ def get_country(mycursor, param):
 
 def get_state_province(mycursor, param):
     # print("STATE_PROVINCE")
-    sql = "SELECT * FROM state_province WHERE name LIKE %s"
+    sql = """SELECT state_province.id, state_province.name, country.name FROM state_province 
+             LEFT JOIN country ON (country.id=country_id) WHERE state_province.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
