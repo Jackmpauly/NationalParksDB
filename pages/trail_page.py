@@ -12,17 +12,17 @@ def gen_trail_dataframe(searchterm):
     dict = {
         'ID':[],
         'Name':[],
-        'Park ID':[],
+        'Park':[],
         'Distance':[]
     }
 
     df = pd.DataFrame(dict)
 
     for trail in tm.get_trail(searchterm):
-        row = pd.DataFrame({'ID':str(trail[0]), 'Name':trail[1], 'Park ID':str(trail[2]), 'Distance':str(trail[3])}, index = [0])
+        row = pd.DataFrame({'ID':str(trail[0]), 'Name':trail[1], 'Park':str(trail[2]), 'Distance':str(trail[3])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
-    df.set_axis(['ID', 'Name', 'Park ID', 'Distance (km)'], axis = 'columns', copy = False)
+    df.set_axis(['ID', 'Name', 'Park', 'Distance (km)'], axis = 'columns', copy = False)
 
     return df
 

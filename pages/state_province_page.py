@@ -63,7 +63,7 @@ def update():
         newAttr = st.text_input('Enter new Name', key="sp_new_name")
     elif attr == 'Country':
         new_country = st.selectbox('Select country:',
-            list(country_dataframe.loc()[:,'Name']))
+            list(cp.gen_country_dataframe('').loc()[:,'Name']))
         tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
         newAttr = tm.mycursor.fetchone()[0]
     
@@ -74,7 +74,7 @@ def update():
 def add():
     new_name = st.text_input('Enter State/Province name:', key="sp_new_name2")
     new_country = st.selectbox('Select country:',
-        list(country_dataframe.loc()[:,'Name']))
+        list(cp.gen_country_dataframe('').loc()[:,'Name']))
     tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
     new_country_id = tm.mycursor.fetchone()[0]
     if(st.button('Add', key="sp_add_button")):
@@ -99,8 +99,7 @@ def main():
 
     global country_dataframe
     country_dataframe = cp.gen_country_dataframe('')
-
-    st.table(country_dataframe)
+    
 
 
     modify()
