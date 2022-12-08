@@ -67,7 +67,6 @@ def update():
 
     if (st.button('Update', key = 'mountain_update_button')):
         tm.update_mountain(name, attr, newAttr)
-        tm.commitData()
 
 def add():
     new_name = st.text_input('Enter Mountain name:', key = 'mountain_add_name')
@@ -78,7 +77,6 @@ def add():
 
     if (st.button('Add', key = 'mountain_add_button')):
         tm.insert_mountain(new_name, new_park_id, new_elevation)
-        tm.commitData()
 
 def delete():
     tempdf = mountain_dataframe.sort_values(by = ['Name'])
@@ -86,7 +84,6 @@ def delete():
 
     if (st.button('Delete', key = 'mountain_delete_button')):
         tm.delete_mountain(name)
-        tm.commitData()
 
 def main():
     global mountain_dataframe

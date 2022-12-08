@@ -10,8 +10,14 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 
+def begin_transaction():
+    mycursor.execute("START TRANSACTION")
+
+def rollback():
+    mycursor.execute("ROLLBACK")
+
 def commitData():
-    mydb.commit()
+    mycursor.execute("COMMIT")
 
 def isNull(str):
     if( str == "NULL" ):
@@ -52,12 +58,17 @@ def init_country():
 def insert_country(name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
 
+    begin_transaction()
     try:
         mycursor.execute(sql, (name, region) )
     except mysql.connector.IntegrityError as duplicate_error:
         print("An entry with the name: " + name + " already exists.")
+        rollback()
     except mysql.connector.DatabaseError as invalid_region_error:
         print("An invalid region was entered: " + region)
+        rollback()
+
+    commitData()
 
 def update_country(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM country WHERE name = %s""", (name, ))
@@ -78,14 +89,19 @@ def update_country(name, attribute, new_value):
         case 'Region':
             region = new_value
 
+    begin_transaction()
     try:
         mycursor.execute("""UPDATE country SET name = %s, region = %s WHERE id = %s""", (current_name, region, id))
     # Duplicate name will throw IntegrityError thanks to UNIQUE constraint
     except mysql.connector.IntegrityError as duplicate_error:
         print("An entry with the name: " + current_name+ " already exists. Please enter a different country name and try again")
+        rollback()
     # CHECK for valid region will throw DatabaseError
     except mysql.connector.DatabaseError as invalid_region_error:
         print("An invalid region was entered as the updated region: " + region + "\nValid regions are: Africa, Asia, Europe, Ocenia, North America, South America")
+        rollback()
+
+    commitData()
 
 def delete_country(name):
     mycursor.execute("""SELECT id FROM country WHERE name = %s""", (name, ))
@@ -98,7 +114,14 @@ def delete_country(name):
         return
 
     id_to_delete = fetched_row[0]
-    mycursor.execute("""DELETE FROM country WHERE id = %s""", (id_to_delete, ))
+    begin_transaction()
+    try:
+        mycursor.execute("""DELETE FROM country WHERE id = %s""", (id_to_delete, ))
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def init_state_province():
     mycursor.execute(
@@ -143,9 +166,15 @@ def insert_state_province(name, country_id):
     if(dupe):
         print("duplicate")
     else:
-        mycursor.execute(statement, (name, country_id) )
-        
+        begin_transaction()
+        try:
+            mycursor.execute(statement, (name, country_id) )
+        except mysql.connector.DatabaseError as error:
+            print("Something went wrong. {}".format(error))
+            rollback()
 
+        commitData()
+        
 def update_state_province(old_name, attr, val):
     mycursor.execute(
         """SELECT * FROM state_province
@@ -168,13 +197,18 @@ def update_state_province(old_name, attr, val):
         case "Country":
             country_id = val;
     
+    begin_transaction()
     try:
         mycursor.execute("""UPDATE state_province SET name = %s, country_id = %s WHERE id = %s""", (name, country_id, id) )
     except mysql.connector.IntegrityError as country_id_error:
         print("Unable to update state/province: \
             The given country_id " + str(country_id) + " does not exist. Please enter a different country_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+    
+    commitData()
 
 def delete_state_province(name):
     mycursor.execute(
@@ -190,7 +224,14 @@ def delete_state_province(name):
 
     id = update_id[0]
 
-    mycursor.execute("""DELETE FROM state_province WHERE id = %s""", (id,))
+    begin_transaction()
+    try:
+        mycursor.execute("""DELETE FROM state_province WHERE id = %s""", (id,))
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def init_park():
     mycursor.execute(
@@ -222,13 +263,18 @@ def init_park():
 def insert_park(name, visitors_per_year, state_province_id, area, year_established):
     sql = "INSERT INTO park (name, visitors_per_year, state_province_id, area, year_established) VALUES (%s, %s, %s, %s, %s)"
     
+    begin_transaction()
     try:
         mycursor.execute(sql, (name, isNull(visitors_per_year), isNull(state_province_id), isNull(area), isNull(year_established)))
     except mysql.connector.IntegrityError as sp_id_error:
         print("Unable to add park: \
             The given state/province id " + str(state_province_id) + " does not exist. Please enter a new state/province id and try agian")
+        rollback()
     except mysql.connector.Error as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+    
+    commitData()
 
 def update_park(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM park WHERE name = %s""", (name,))
@@ -253,6 +299,7 @@ def update_park(name, attribute, new_value):
         case 'Year Established':
             year_established = new_value
 
+    begin_transaction()
     try:
         mycursor.execute(
             """
@@ -265,8 +312,12 @@ def update_park(name, attribute, new_value):
     # Thrown when attempting to update SP_ID to an invalid SP_ID
     except mysql.connector.IntegrityError as sp_id_error:
         print("Unable to update park: The given state_province_id: " + str(sp_id) + " does not exist. Enter a different state_province_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+    
+    commitData()
 
 def delete_park(name):
     mycursor.execute("""SELECT id FROM park WHERE name = %s""", (name, ))
@@ -278,7 +329,14 @@ def delete_park(name):
         return
 
     id_to_delete = fetched_row[0]
-    mycursor.execute("""DELETE FROM park WHERE id = %s""", (id_to_delete, ))
+    begin_transaction()
+    try:
+        mycursor.execute("""DELETE FROM park WHERE id = %s""", (id_to_delete, ))
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 # Create and initialize the lake table
 def init_lake():
@@ -311,13 +369,18 @@ def init_lake():
 def insert_lake(name, park_id, type, depth):
     sql = "INSERT INTO lake (name, park_id, type, depth) VALUES (%s, %s, %s, %s)"
 
+    begin_transaction()
     try:
         mycursor.execute(sql, (name, isNull(park_id), type, isNull(depth)))
     # Invalid park_id throws IntegrityError
     except mysql.connector.IntegrityError as park_id_error:
         print("Unable to insert lake: No park exists with id: " + str(park_id) + ". Please enter a different park_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def update_lake(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM lake WHERE name = %s""", (name,))
@@ -339,6 +402,7 @@ def update_lake(name, attribute, new_value):
         case 'Depth':
             depth = new_value
 
+    begin_transaction()
     try:
         mycursor.execute(
             """
@@ -351,8 +415,12 @@ def update_lake(name, attribute, new_value):
     # Thrown when attempting to update park_id to an invalid park_id
     except mysql.connector.IntegrityError as park_id_error:
         print("Unable to update lake: The given park_id: " + str(park_id) + " does not exist. Enter a different park_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+    
+    commitData()
 
 def delete_lake(name):
     mycursor.execute("""SELECT id FROM lake where name = %s""", (name, ))
@@ -363,7 +431,14 @@ def delete_lake(name):
         return
 
     id_to_delete = fetched_row[0]
-    mycursor.execute("""DELETE FROM lake WHERE id = %s""", (id_to_delete, ))
+    begin_transaction()
+    try:
+        mycursor.execute("""DELETE FROM lake WHERE id = %s""", (id_to_delete, ))
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 # Create and initialize the mountain table
 def init_mountain():
@@ -395,13 +470,18 @@ def init_mountain():
 def insert_mountain(name, park_id, elevation):
     sql = "INSERT INTO mountain (name, park_id, elevation) VALUES (%s, %s, %s)"
 
+    begin_transaction()
     try:
         mycursor.execute(sql, (name, park_id, elevation))
     # Invalid park_id throws IntegrityError
     except mysql.connector.IntegrityError as park_id_error:
         print("Unable to insert mountain: No park exists with id: " + str(park_id) + ". Please enter a different park_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def update_mountain(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM mountain WHERE name = %s""", (name, ))
@@ -421,6 +501,7 @@ def update_mountain(name, attribute, new_value):
         case 'Elevation':
             elevation = new_value
 
+    begin_transaction()
     try:
         mycursor.execute(
             """
@@ -433,8 +514,12 @@ def update_mountain(name, attribute, new_value):
     # Thrown when attemtping to update park_id to an invalid park_id
     except mysql.connector.IntegrityError as park_id_error:
         print("Unable to update mountain: The given park_id: " + str(park_id) + " does not exist. Enter a different park_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def delete_mountain(name):
     mycursor.execute("""SELECT id FROM mountain WHERE name = %s""", (name, ))
@@ -445,7 +530,14 @@ def delete_mountain(name):
         return
 
     id_to_delete = fetched_row[0]
-    mycursor.execute("""DELETE FROM mountain WHERE id = %s""", (id_to_delete, ))
+    begin_transaction()
+    try:
+        mycursor.execute("""DELETE FROM mountain WHERE id = %s""", (id_to_delete, ))
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 # Create and initialize the trail table
 def init_trail():
@@ -477,13 +569,18 @@ def init_trail():
 def insert_trail(name, park_id, distance):
     sql = "INSERT INTO trail (name, park_id, distance) VALUES (%s, %s, %s)"
 
+    begin_transaction()
     try:
         mycursor.execute(sql, (name, park_id, distance))
     # Invalid park_id throws IntegrityError
     except mysql.connector.IntegrityError as park_id_error:
         print("Unable to insert trail: No park exists with id: " + str(park_id) + ". Please enter a different park_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def update_trail(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM trail WHERE name = %s""", (name, ))
@@ -503,6 +600,7 @@ def update_trail(name, attribute, new_value):
         case 'Distance (km)':
             distance = new_value
 
+    begin_transaction()
     try:
         mycursor.execute(
             """
@@ -514,8 +612,12 @@ def update_trail(name, attribute, new_value):
         )
     except mysql.connector.IntegrityError as park_id_error:
         print("Unable to update trail: The given park_id: " + str(park_id) + " does not exist. Enter a different park_id and try again.")
+        rollback()
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def delete_trail(name):
     mycursor.execute("""SELECT id FROM trail WHERE name = %s""", (name, ))
@@ -526,7 +628,14 @@ def delete_trail(name):
         return
 
     id_to_delete = fetched_row[0]
-    mycursor.execute("""DELETE FROM trail WHERE id = %s""", (id_to_delete, ))
+    begin_transaction()
+    try:
+        mycursor.execute("""DELETE FROM trail WHERE id = %s""", (id_to_delete, ))
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+        rollback()
+
+    commitData()
 
 def test():
     mycursor.execute(

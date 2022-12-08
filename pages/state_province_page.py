@@ -66,7 +66,6 @@ def update():
     
     if(st.button('Update', key="sp_update_button")):
         tm.update_state_province(name, attr, newAttr)
-        tm.commitData()
 
 def add():
     new_name = st.text_input('Enter State/Province name:', key="sp_new_name2")
@@ -76,7 +75,6 @@ def add():
     new_country_id = tm.mycursor.fetchone()[0]
     if(st.button('Add', key="sp_add_button")):
         tm.insert_state_province(new_name, new_country_id)
-        tm.commitData()
 
 def delete():
     tempdf = sp_dataframe.sort_values(by=['Name'])
@@ -84,7 +82,6 @@ def delete():
         tempdf['Name'])
     if(st.button('Delete', key="sp_delete_button")):
         tm.delete_state_province(name)
-        tm.commitData()
 
 def main():
     global sp_dataframe
