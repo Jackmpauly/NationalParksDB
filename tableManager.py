@@ -414,11 +414,11 @@ def update_mountain(name, attribute, new_value):
     id, current_name, park_id, elevation = row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3]
 
     match attribute:
-        case 'name':
+        case 'Name':
             current_name = new_value
-        case 'park_id':
+        case 'Park ID':
             park_id = new_value
-        case 'elevation':
+        case 'Elevation':
             elevation = new_value
 
     try:
