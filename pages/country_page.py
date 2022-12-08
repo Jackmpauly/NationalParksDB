@@ -19,12 +19,10 @@ def gen_country_dataframe(searchterm):
         row = pd.DataFrame({'ID':str(country[0]), 'Name':country[1], 'Region':country[2]}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
 
-    df.set_axis(['ID', 'Name', 'Region'], axis = 'columns', copy = False)
-    
-    return df
+    return df.set_axis(['ID', 'Name', 'Region'], axis = 'columns', copy = False)
 
 def draw_textbox():
-    name = st.text_input('Country', '')
+    name = st.text_input('Country', '', key = 'country_drawTextBox')
     st.write('Searching for ', name)
     global country_dataframe
     country_dataframe = gen_country_dataframe(name)
@@ -35,15 +33,17 @@ def modify():
     page = st.radio('Choose one', page_names, key="country_selection")
     st.write('You selected:', page)
 
-    if page == 'Update':
-        update()
-    elif page == 'Add':
-        add()
-    elif page == 'Delete':
-        delete()
+    match page:
+        case 'Update':
+            update()
+        case 'Add':
+            add()
+        case 'Delete':
+            delete()
+        case _:
+            st.write('Error: Invalid page name')
 
     country_dataframe = gen_country_dataframe('')
-
 
 def update():
     tempdf = country_dataframe.sort_values(by=['Name'])
