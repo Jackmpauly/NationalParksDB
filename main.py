@@ -1,48 +1,37 @@
 import mysql.connector
 import csv
-import tableManager
+import tableManager as tm
 
 import pandas as pd
 
-mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = "password",
-    database = "NationalParks"
-)
-
-mycursor = mydb.cursor()
 
 def main():
 
-    # mycursor.execute("CREATE DATABASE NationalParks"))
 
 
-    tableManager.dropAllTables(mycursor)
-    # mycursor.execute("DROP TABLE country CASCADE")
-    tableManager.init_country(mycursor)
-    tableManager.init_state_province(mycursor)
-    tableManager.init_park(mycursor)
+    tm.dropAllTables()
+    tm.init_country()
+    tm.init_state_province()
+    tm.init_park()
 
-    # mycursor.execute("DELETE FROM country WHERE (id = 37)")
 
     # user add values
-    tableManager.insert_country(mycursor, "Mexico", "North America")
-    tableManager.print_country(mycursor)
+    tm.insert_country("Mexico", "North America")
+    tm.print_country()
 
-    tableManager.print_state_province(mycursor)
+    tm.print_state_province()
 
-    tableManager.insert_state_province(mycursor, "Sinaloa", 54)
-    tableManager.print_state_province(mycursor)
+    tm.insert_state_province("Sinaloa", 54)
+    tm.print_state_province()
 
     # user update values
-    tableManager.update_state_province(mycursor, "Sinaloa", "country_id", 32)
-    tableManager.print_state_province(mycursor)
+    tm.update_state_province("Sinaloa", "country_id", 32)
+    tm.print_state_province()
 
 
     # user delete values
-    tableManager.delete_state_province(mycursor, "Sinaloa")
-    tableManager.print_state_province(mycursor)
+    tm.delete_state_province("Sinaloa")
+    tm.print_state_province()
 
     # user can search for things
         # will have the kinds of things they can search for
@@ -53,59 +42,59 @@ def main():
 
 
 def init():
-    tableManager.init_park(mycursor)
+    tm.init_park()
 
 def init_all():
-    tableManager.dropAllTables(mycursor)
+    tm.dropAllTables()
 
-    tableManager.init_country(mycursor)
-    tableManager.init_state_province(mycursor)
-    tableManager.init_park(mycursor)
-    tableManager.init_lake(mycursor)
-    tableManager.init_mountain(mycursor)
-    tableManager.init_trail(mycursor)
+    tm.init_country()
+    tm.init_state_province()
+    tm.init_park()
+    tm.init_lake()
+    tm.init_mountain()
+    tm.init_trail()
 
     # Commit changes to database
-    mydb.commit()
+    tm.commitData()
 
 #init()
 init_all()
 
 # Test for Delete Country
-# tableManager.delete_country(mycursor, 'New Zealand')
+# tm.delete_country('New Zealand')
 
 # Test for Update Country
-# tableManager.update_country(mycursor, 'Greece', 'name', 'Mozambique')
-# tableManager.update_country(mycursor, 'Mozambique', 'region', 'Africa')
+# tm.update_country('Greece', 'name', 'Mozambique')
+# tm.update_country('Mozambique', 'region', 'Africa')
 
 # Tests for Park INSERT/UPDATE/DELETE
-# tableManager.insert_park(mycursor, "Some Really Cool National Park", 85000, 45, "NULL", 1923)
-# tableManager.update_park(mycursor, "Some Really Cool National Park", "year_established", 2014)
-# tableManager.delete_park(mycursor, "Some Really Cool National Park")
+# tm.insert_park("Some Really Cool National Park", 85000, 45, "NULL", 1923)
+# tm.update_park("Some Really Cool National Park", "year_established", 2014)
+# tm.delete_park("Some Really Cool National Park")
 
 # Tests for Lake INSERT/UPDATE/DELETE
-# tableManager.insert_lake(mycursor, 'Lake Tahoe', 33, 'Freshwater', 501)
-# tableManager.update_lake(mycursor, 'Lake Tahoe', "name", 'Lake Smokin A Pack')
-# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', "park_id", 100)
-# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'park_id', 32)
-# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'type', 'Crater')
-# tableManager.update_lake(mycursor, 'Lake Smokin A Pack', 'depth', 2)
-# tableManager.delete_lake(mycursor, 'Lake Smokin A Pack')
+# tm.insert_lake('Lake Tahoe', 33, 'Freshwater', 501)
+# tm.update_lake('Lake Tahoe', "name", 'Lake Smokin A Pack')
+# tm.update_lake('Lake Smokin A Pack', "park_id", 100)
+# tm.update_lake('Lake Smokin A Pack', 'park_id', 32)
+# tm.update_lake('Lake Smokin A Pack', 'type', 'Crater')
+# tm.update_lake('Lake Smokin A Pack', 'depth', 2)
+# tm.delete_lake('Lake Smokin A Pack')
 
 # Tests for Mountain INSERT/UPDATE/DELETE
-# tableManager.insert_mountain(mycursor, 'Pompeii', 1, 1433)
-# tableManager.update_mountain(mycursor, 'Pompeii', 'name', 'Mount Pauly')
-# tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 99)
-# tableManager.update_mountain(mycursor, 'Mount Pauly', 'park_id', 14)
-# tableManager.update_mountain(mycursor, 'Mount Pauly', 'elevation', 9999)
-# tableManager.delete_mountain(mycursor, 'Mount Pauly')
+# tm.insert_mountain('Pompeii', 1, 1433)
+# tm.update_mountain('Pompeii', 'name', 'Mount Pauly')
+# tm.update_mountain('Mount Pauly', 'park_id', 99)
+# tm.update_mountain('Mount Pauly', 'park_id', 14)
+# tm.update_mountain('Mount Pauly', 'elevation', 9999)
+# tm.delete_mountain('Mount Pauly')
 
 # Tests for Trail INSERT/UPDATE/DELETE
-# tableManager.insert_trail(mycursor, 'Happy Trail', 23, 56.4)
-# tableManager.update_trail(mycursor, 'Happy Trail', 'name', 'Sad Trail')
-# tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 152)
-# tableManager.update_trail(mycursor, 'Sad Trail', 'park_id', 22)
-# tableManager.update_trail(mycursor, 'Sad Trail', 'distance', 49.21)
-# tableManager.delete_trail(mycursor, 'Sad Trail')
+# tm.insert_trail('Happy Trail', 23, 56.4)
+# tm.update_trail('Happy Trail', 'name', 'Sad Trail')
+# tm.update_trail('Sad Trail', 'park_id', 152)
+# tm.update_trail('Sad Trail', 'park_id', 22)
+# tm.update_trail('Sad Trail', 'distance', 49.21)
+# tm.delete_trail('Sad Trail')
 
-tableManager.print_all(mycursor)
+tm.print_all()

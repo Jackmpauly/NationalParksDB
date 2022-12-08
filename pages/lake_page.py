@@ -3,14 +3,6 @@ import streamlit as st
 import pandas as pd
 import tableManager as tm
 
-mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "password",
-        database = "NationalParks"
-    )
-
-mycursor = mydb.cursor()
 
 lake_dataframe = None
 
@@ -26,7 +18,7 @@ def gen_lake_dataframe(searchterm):
 
     df = pd.DataFrame(dict)
 
-    for lake in tm.get_lake(mycursor, searchterm):
+    for lake in tm.get_lake(searchterm):
         row = pd.DataFrame({'ID':str(lake[0]), 'Name':lake[1], 'Park ID':str(lake[2]), 'Type':lake[3], \
              'Depth':str(lake[4])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)

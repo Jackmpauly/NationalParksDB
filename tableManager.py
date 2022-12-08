@@ -1,13 +1,25 @@
 import mysql.connector
 import csv
 
+mydb = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "password",
+    database = "NationalParks"
+)
+
+mycursor = mydb.cursor()
+
+def commitData():
+    mydb.commit()
+
 def isNull(str):
     if( str == "NULL" ):
         # print("here")
         return None
     return int(str)
 
-def dropAllTables(mycursor):
+def dropAllTables():
     mycursor.execute("DROP TABLE IF EXISTS trail")
     mycursor.execute("DROP TABLE IF EXISTS mountain")
     mycursor.execute("DROP TABLE IF EXISTS lake")
@@ -15,7 +27,7 @@ def dropAllTables(mycursor):
     mycursor.execute("DROP TABLE IF EXISTS state_province")
     mycursor.execute("DROP TABLE IF EXISTS country")
 
-def init_country(mycursor):
+def init_country():
     mycursor.execute(
         """CREATE TABLE country (
             id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
@@ -37,7 +49,7 @@ def init_country(mycursor):
     for x in myresult:
         print(x)
 
-def insert_country(mycursor, name, region):
+def insert_country(name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
 
     try:
@@ -47,7 +59,7 @@ def insert_country(mycursor, name, region):
     except mysql.connector.DatabaseError as invalid_region_error:
         print("An invalid region was entered: " + region)
 
-def update_country(mycursor, name, attribute, new_value):
+def update_country(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM country WHERE name = %s""", (name, ))
 
     row_to_update = mycursor.fetchone()
@@ -75,7 +87,7 @@ def update_country(mycursor, name, attribute, new_value):
     except mysql.connector.DatabaseError as invalid_region_error:
         print("An invalid region was entered as the updated region: " + region + "\nValid regions are: Africa, Asia, Europe, Ocenia, North America, South America")
 
-def delete_country(mycursor, name):
+def delete_country(name):
     mycursor.execute("""SELECT id FROM country WHERE name = %s""", (name, ))
 
     fetched_row = mycursor.fetchone()
@@ -88,7 +100,7 @@ def delete_country(mycursor, name):
     id_to_delete = fetched_row[0]
     mycursor.execute("""DELETE FROM country WHERE id = %s""", (id_to_delete, ))
 
-def init_state_province(mycursor):
+def init_state_province():
     mycursor.execute(
         """CREATE TABLE state_province (
             id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
@@ -110,7 +122,7 @@ def init_state_province(mycursor):
     for x in myresult:
         print(x)
 
-def is_duplicate_state_province(mycursor, name, country_id):
+def is_duplicate_state_province(name, country_id):
     getcount = (
         """SELECT COUNT(*) AS c FROM state_province
             WHERE (name = %s) AND (country_id = %s)
@@ -124,7 +136,7 @@ def is_duplicate_state_province(mycursor, name, country_id):
     else:
         return False
 
-def insert_state_province(mycursor, name, country_id):
+def insert_state_province(name, country_id):
     dupe = is_duplicate_state_province(mycursor, name, country_id)
 
     statement = "INSERT INTO state_province (name, country_id) VALUES (%s, %s)"
@@ -134,7 +146,7 @@ def insert_state_province(mycursor, name, country_id):
         mycursor.execute(statement, (name, country_id) )
         
 
-def update_state_province(mycursor, old_name, attr, val):
+def update_state_province(old_name, attr, val):
     mycursor.execute(
         """SELECT * FROM state_province
             WHERE name = %s
@@ -164,7 +176,7 @@ def update_state_province(mycursor, old_name, attr, val):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def delete_state_province(mycursor, name):
+def delete_state_province(name):
     mycursor.execute(
         """SELECT id FROM state_province
             WHERE name = %s
@@ -180,7 +192,7 @@ def delete_state_province(mycursor, name):
 
     mycursor.execute("""DELETE FROM state_province WHERE id = %s""", (id,))
 
-def init_park(mycursor):
+def init_park():
     mycursor.execute(
         """CREATE TABLE park (
             id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
@@ -207,7 +219,7 @@ def init_park(mycursor):
     for x in myresult:
         print(x)
 
-def insert_park(mycursor, name, visitors_per_year, state_province_id, area, year_established):
+def insert_park(name, visitors_per_year, state_province_id, area, year_established):
     sql = "INSERT INTO park (name, visitors_per_year, state_province_id, area, year_established) VALUES (%s, %s, %s, %s, %s)"
     
     try:
@@ -218,7 +230,7 @@ def insert_park(mycursor, name, visitors_per_year, state_province_id, area, year
     except mysql.connector.Error as error:
         print("Something went wrong. {}".format(error))
 
-def update_park(mycursor, name, attribute, new_value):
+def update_park(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM park WHERE name = %s""", (name,))
 
     row_to_update = mycursor.fetchone()
@@ -256,7 +268,7 @@ def update_park(mycursor, name, attribute, new_value):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def delete_park(mycursor, name):
+def delete_park(name):
     mycursor.execute("""SELECT id FROM park WHERE name = %s""", (name, ))
 
     fetched_row = mycursor.fetchone()
@@ -269,7 +281,7 @@ def delete_park(mycursor, name):
     mycursor.execute("""DELETE FROM park WHERE id = %s""", (id_to_delete, ))
 
 # Create and initialize the lake table
-def init_lake(mycursor):
+def init_lake():
     mycursor.execute(
         """
         CREATE TABLE lake (
@@ -296,7 +308,7 @@ def init_lake(mycursor):
     for x in myresult:
         print(x)
 
-def insert_lake(mycursor, name, park_id, type, depth):
+def insert_lake(name, park_id, type, depth):
     sql = "INSERT INTO lake (name, park_id, type, depth) VALUES (%s, %s, %s, %s)"
 
     try:
@@ -307,7 +319,7 @@ def insert_lake(mycursor, name, park_id, type, depth):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def update_lake(mycursor, name, attribute, new_value):
+def update_lake(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM lake WHERE name = %s""", (name,))
 
     row_to_update = mycursor.fetchone()
@@ -342,7 +354,7 @@ def update_lake(mycursor, name, attribute, new_value):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def delete_lake(mycursor, name):
+def delete_lake(name):
     mycursor.execute("""SELECT id FROM lake where name = %s""", (name, ))
 
     fetched_row = mycursor.fetchone()
@@ -354,7 +366,7 @@ def delete_lake(mycursor, name):
     mycursor.execute("""DELETE FROM lake WHERE id = %s""", (id_to_delete, ))
 
 # Create and initialize the mountain table
-def init_mountain(mycursor):
+def init_mountain():
     mycursor.execute(
         """
         CREATE TABLE mountain (
@@ -380,7 +392,7 @@ def init_mountain(mycursor):
     for x in myresult:
         print(x)
 
-def insert_mountain(mycursor, name, park_id, elevation):
+def insert_mountain(name, park_id, elevation):
     sql = "INSERT INTO mountain (name, park_id, elevation) VALUES (%s, %s, %s)"
 
     try:
@@ -391,7 +403,7 @@ def insert_mountain(mycursor, name, park_id, elevation):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def update_mountain(mycursor, name, attribute, new_value):
+def update_mountain(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM mountain WHERE name = %s""", (name, ))
 
     row_to_update = mycursor.fetchone()
@@ -424,7 +436,7 @@ def update_mountain(mycursor, name, attribute, new_value):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def delete_mountain(mycursor, name):
+def delete_mountain(name):
     mycursor.execute("""SELECT id FROM mountain WHERE name = %s""", (name, ))
 
     fetched_row = mycursor.fetchone()
@@ -436,7 +448,7 @@ def delete_mountain(mycursor, name):
     mycursor.execute("""DELETE FROM mountain WHERE id = %s""", (id_to_delete, ))
 
 # Create and initialize the trail table
-def init_trail(mycursor):
+def init_trail():
     mycursor.execute(
         """
         CREATE TABLE trail (
@@ -462,7 +474,7 @@ def init_trail(mycursor):
     for x in myresult:
         print(x)
 
-def insert_trail(mycursor, name, park_id, distance):
+def insert_trail(name, park_id, distance):
     sql = "INSERT INTO trail (name, park_id, distance) VALUES (%s, %s, %s)"
 
     try:
@@ -473,7 +485,7 @@ def insert_trail(mycursor, name, park_id, distance):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def update_trail(mycursor, name, attribute, new_value):
+def update_trail(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM trail WHERE name = %s""", (name, ))
 
     row_to_update = mycursor.fetchone()
@@ -505,7 +517,7 @@ def update_trail(mycursor, name, attribute, new_value):
     except mysql.connector.DatabaseError as error:
         print("Something went wrong. {}".format(error))
 
-def delete_trail(mycursor, name):
+def delete_trail(name):
     mycursor.execute("""SELECT id FROM trail WHERE name = %s""", (name, ))
 
     fetched_row = mycursor.fetchone()
@@ -516,7 +528,7 @@ def delete_trail(mycursor, name):
     id_to_delete = fetched_row[0]
     mycursor.execute("""DELETE FROM trail WHERE id = %s""", (id_to_delete, ))
 
-def test(mycursor):
+def test():
     mycursor.execute(
         """CREATE TABLE park (
             id INT AUTO_INCREMENT PRIMARY KEY, 
@@ -541,51 +553,51 @@ def test(mycursor):
         print(x)
 
 
-def get_country(mycursor, param):
+def get_country(param):
     # print("COUNTRY")
     sql = "SELECT * FROM country WHERE name LIKE %s"
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_state_province(mycursor, param):
+def get_state_province(param):
     # print("STATE_PROVINCE")
     sql = """SELECT state_province.id, state_province.name, country.name FROM state_province 
              LEFT JOIN country ON (country.id=country_id) WHERE state_province.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_park(mycursor, param):
+def get_park(param):
     # print("PARK")
-    sql = "SELECT * FROM park WHERE name LIKE %s"
+    sql = """SELECT * FROM park WHERE name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_lake(mycursor, param):
+def get_lake(param):
     sql = "SELECT * FROM lake WHERE name LIKE %s"
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_mountain(mycursor, param):
+def get_mountain(param):
     sql = "SELECT * FROM mountain WHERE name LIKE %s"
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 # TODO: FOR SOME REASON THIS AIN'T WORKING
-def get_trail(mycursor, param):
+def get_trail(param):
     sql = "SELECT * FROM trail WHERE name LIKE %s"
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def print_all(mycursor):
-    for x in get_country(mycursor, ""):
+def print_all():
+    for x in get_country(""):
         print(x)
-    for x in get_state_province(mycursor, ""):
+    for x in get_state_province(""):
         print(x)
-    for x in get_park(mycursor, ""):
+    for x in get_park(""):
         print(x)
-    for x in get_lake(mycursor, ""):
+    for x in get_lake(""):
         print(x)
-    for x in get_mountain(mycursor, ""):
+    for x in get_mountain(""):
         print(x)
-    for x in get_trail(mycursor, ""):
+    for x in get_trail(""):
         print(x)

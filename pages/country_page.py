@@ -3,15 +3,6 @@ import streamlit as st
 import pandas as pd
 import tableManager as tm
 
-mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "password",
-        database = "NationalParks"
-    )
-
-mycursor = mydb.cursor()
-
 country_dataframe = None
 
 def gen_country_dataframe(searchterm):
@@ -24,7 +15,7 @@ def gen_country_dataframe(searchterm):
 
     df = pd.DataFrame(dict)
 
-    for country in tm.get_country(mycursor, searchterm):
+    for country in tm.get_country(searchterm):
         row = pd.DataFrame({'ID':str(country[0]), 'Name':country[1], 'Region':country[2]}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
 
@@ -66,24 +57,24 @@ def update():
         newAttr = st.selectbox('Select Region:',
             ['Africa', 'Asia', 'North America', 'South America', 'Oceania', 'Europe'])
     if(st.button('Update', key="country_update_button")):
-        tm.update_country(mycursor, name, attr, newAttr)
-        mydb.commit()
+        tm.update_country(name, attr, newAttr)
+        tm.commitData()
 
 def add():
     new_name = st.text_input('Enter Country name:')
     new_region = st.selectbox('Select Region:',
             ['Africa', 'Asia', 'North America', 'South America', 'Oceania', 'Europe'])
     if(st.button('Add', key="country_add_button")):
-        tm.insert_country(mycursor, new_name, new_region)
-        mydb.commit()
+        tm.insert_country(new_name, new_region)
+        tm.commitData()
 
 def delete():
     tempdf = country_dataframe.sort_values(by=['Name'])
     name = st.selectbox('Select a Country to Delete',
         tempdf['Name'])
     if(st.button('Delete', key="country_delete_button")):
-        tm.delete_country(mycursor, name)
-        mydb.commit()
+        tm.delete_country(name)
+        tm.commitData()
 
 def main():
 

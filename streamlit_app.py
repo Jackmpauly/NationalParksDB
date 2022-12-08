@@ -12,14 +12,6 @@ import pages.lake_page as lp
 import pages.trail_page as tp
 
 
-mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "password",
-        database = "NationalParks"
-    )
-
-mycursor = mydb.cursor()
 
 def main():
     print("reset")

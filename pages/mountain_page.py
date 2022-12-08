@@ -3,15 +3,6 @@ import streamlit as st
 import pandas as pd
 import tableManager as tm
 
-mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "password",
-        database = "NationalParks"
-    )
-
-mycursor = mydb.cursor()
-
 mountain_dataframe = None
 
 def gen_mountain_dataframe(searchterm):
@@ -25,7 +16,7 @@ def gen_mountain_dataframe(searchterm):
 
     df = pd.DataFrame(dict)
 
-    for mountain in tm.get_mountain(mycursor, searchterm):
+    for mountain in tm.get_mountain(searchterm):
         row = pd.DataFrame({'ID':str(mountain[0]), 'Name':mountain[1], 'Park ID':str(mountain[2]), 'Elevation':str(mountain[3])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
