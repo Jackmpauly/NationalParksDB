@@ -25,9 +25,7 @@ def gen_lake_dataframe(searchterm):
              'Depth':str(lake[4])}, index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
-    df.set_axis(['ID', 'Name', 'Park', 'Type', 'Depth (m)'], axis = 'columns', copy = False)
-
-    return df
+    return df.set_axis(['ID', 'Name', 'Park', 'Type', 'Depth (m)'], axis = 'columns', copy = False)
 
 def draw_textbox():
     name = st.text_input('Lake', '', key = 'lake_drawTextBox')
