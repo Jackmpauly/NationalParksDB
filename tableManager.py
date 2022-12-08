@@ -242,15 +242,15 @@ def update_park(name, attribute, new_value):
         row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3], row_to_update[4], row_to_update[5]
 
     match attribute:
-        case 'name':
+        case 'Name':
             current_name = new_value
-        case 'visitors_per_year':
+        case 'Visitors Per Year':
             visitors_per_year = new_value
-        case 'state_province_id':
+        case 'State/Province':
             sp_id = new_value
-        case 'area':
+        case 'Area (km sqd)':
             area = new_value
-        case 'year_established':
+        case 'Year Established':
             year_established = new_value
 
     try:
@@ -498,9 +498,9 @@ def update_trail(name, attribute, new_value):
     match attribute:
         case 'name':
             current_name = new_value
-        case 'park_id':
+        case 'Park ID':
             park_id = new_value
-        case 'distance':
+        case 'Distance (km)':
             distance = new_value
 
     try:

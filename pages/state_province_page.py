@@ -25,10 +25,7 @@ def gen_sp_dataframe(searchterm):
         df = pd.concat([df.loc[:], row]).reset_index(drop=True)
 
 
-    df.set_axis(['ID', 'Name', 'Country'], axis = 'columns', copy = False)
-    
-    # return the dataframe
-    return df
+    return df.set_axis(['ID', 'Name', 'Country'], axis = 'columns', copy = False)
 
 def draw_textbox():
     name = st.text_input('State/Province', '', key="sp_drawTextBox")
@@ -63,7 +60,7 @@ def update():
         newAttr = st.text_input('Enter new Name', key="sp_new_name")
     elif attr == 'Country':
         new_country = st.selectbox('Select country:',
-            list(cp.gen_country_dataframe('').loc()[:,'Name']))
+            list(cp.gen_country_dataframe('').sort_values(by=['Name']).loc()[:,'Name']))
         tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
         newAttr = tm.mycursor.fetchone()[0]
     
@@ -74,7 +71,7 @@ def update():
 def add():
     new_name = st.text_input('Enter State/Province name:', key="sp_new_name2")
     new_country = st.selectbox('Select country:',
-        list(cp.gen_country_dataframe('').loc()[:,'Name']))
+        list(cp.gen_country_dataframe('').sort_values(by=['Name']).loc()[:,'Name']))
     tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
     new_country_id = tm.mycursor.fetchone()[0]
     if(st.button('Add', key="sp_add_button")):
@@ -90,22 +87,11 @@ def delete():
         tm.commitData()
 
 def main():
-    print("reset")
-    # writing simple text
-    # st.text("Hello")
-
     global sp_dataframe
-    sp_dataframe = gen_sp_dataframe('')    
-
-    global country_dataframe
-    country_dataframe = cp.gen_country_dataframe('')
-    
-
+    sp_dataframe = gen_sp_dataframe('')
 
     modify()
     draw_textbox()
     st.table(sp_dataframe)
-
-    # st.table(cp.gen_country_dataframe(""))
 
 main()
