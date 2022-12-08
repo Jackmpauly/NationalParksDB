@@ -56,7 +56,7 @@ def modify():
 def update():
     # Select box for name of Mountain to modify
     name = st.selectbox('Select a Mountain to modify', 
-                        mountain_dataframe.sort_values(by = ['Name']).loc()[:,'Name'])
+                        mountain_dataframe.sort_values(by=['Name']).loc()[:,'Name'])
     # Radio selection for attribute to modify
     attr = st.radio('Select an attribute to modify', 
                     list(mountain_dataframe.columns.values)[1:], key='mountain_attr')
@@ -67,7 +67,7 @@ def update():
             newAttr = st.text_input('Enter the new name', key='mountain_new_name')
         case 'Park ID':
             new_park = st.selectbox('Select Park:', 
-                                    list(pp.gen_park_dataframe('').sort_values(by = ['Name']).loc()[:, 'Name']))
+                                    list(pp.gen_park_dataframe('').sort_values(by=['Name']).loc()[:, 'Name']))
             tm.mycursor.execute("""SELECT id FROM park WHERE name = %s""", (new_park, ))
             newAttr = tm.mycursor.fetchone()[0] # Get the Park ID from the Park
         case 'Elevation':
@@ -82,7 +82,7 @@ def add():
     new_name = st.text_input('Enter Mountain name:', key='mountain_add_name')
     # Select box for Park
     new_park = st.selectbox('Select Park', 
-                            list(pp.gen_park_dataframe('').sort_values(by = ['Name']).loc()[:, 'Name']))
+                            list(pp.gen_park_dataframe('').sort_values(by=['Name']).loc()[:, 'Name']))
     tm.mycursor.execute("""SELECT id FROM park WHERE name = %s""", (new_park, ))
     new_park_id = tm.mycursor.fetchone()[0] # Get the Park ID from the Park
     # Number input box for Mountain elevation
@@ -94,8 +94,8 @@ def add():
 
 def delete():
     # Select box for Mountain to delete
-    tempdf = mountain_dataframe.sort_values(by = ['Name'])
-    name = st.selectbox('Select a Mountain to delete', tempdf['Name'])
+    name = st.selectbox('Select a Mountain to delete', 
+                        mountain_dataframe.sort_values(by=['Name']).loc()[:,'Name'])
 
     # Button to delete Mountain
     if (st.button('Delete', key='mountain_delete_button')):

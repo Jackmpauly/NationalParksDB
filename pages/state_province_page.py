@@ -89,7 +89,7 @@ def add():
 def delete():
     # Select box for Province to delete
     name = st.selectbox('Select a State/Province to Delete',
-                        sp_dataframe.sort_values(by=['Name']).loc()['Name'])
+                        sp_dataframe.sort_values(by=['Name']).loc()[:, 'Name'])
     
     # Button to delete Country
     if(st.button('Delete', key='sp_delete_button')):
