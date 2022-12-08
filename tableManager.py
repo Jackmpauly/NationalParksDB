@@ -330,13 +330,13 @@ def update_lake(name, attribute, new_value):
     id, current_name, park_id, type, depth = row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3], row_to_update[4]
 
     match attribute:
-        case 'name':
+        case 'Name':
             current_name = new_value
-        case 'park_id':
+        case 'Park ID':
             park_id = new_value
-        case 'type':
+        case 'Type':
             type = new_value
-        case 'depth':
+        case 'Depth':
             depth = new_value
 
     try:
