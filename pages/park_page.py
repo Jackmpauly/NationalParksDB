@@ -6,6 +6,7 @@ import datetime
 import pages.state_province_page as spp
 
 park_dataframe = None
+spp_dataframe = None
 
 # Generate the park dataframe
 def gen_park_dataframe(searchterm):
@@ -31,7 +32,7 @@ def gen_park_dataframe(searchterm):
                             index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
     
-    return df.set_axis(['ID', 'Name', 'Visitors Per Year', 'State/Province', 'Area', 'Year Established'], axis = 'columns', copy = False)
+    return df.set_axis(['ID', 'Name', 'Visitors Per Year', 'State/Province', 'Area (km sqd)', 'Year Established'], axis = 'columns', copy = False)
 
 # Draw the text box for the Park
 def draw_textbox():
@@ -86,7 +87,7 @@ def update():
             
     # Button to apply changes
     if(st.button('Apply', key="park_update_button")):
-        tm.update_state_province(name, attr, newAttr)
+        tm.update_park(name, attr, newAttr)
 
 def add():
     # Text box for new Park name

@@ -67,14 +67,14 @@ def update():
     match attr:
         case 'Name':
             newAttr = st.text_input('Enter the new Name', key='lake_new_name')
-        case 'Park ID':
+        case 'Park':
             new_park = st.selectbox('Select Park:', 
                                     list(pp.gen_park_dataframe('').sort_values(by=['Name']).loc()[:, 'Name']))
             tm.mycursor.execute("""SELECT id FROM park WHERE name = %s""", (new_park, ))
             newAttr = tm.mycursor.fetchone()[0] # Get the Park ID from the Park
         case 'Type':
             newAttr = st.text_input('Enter the new Type', key='lake_new_type')
-        case 'Depth':
+        case 'Depth (m)':
             newAttr = st.number_input('Enter the new Depth', key='lake_new_depth')
     
     # Button to apply changes
