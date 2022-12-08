@@ -574,20 +574,20 @@ def get_park(param):
     return mycursor.fetchall()
 
 def get_lake(param):
-    sql = """SELECT lake.name, p.name, lake.type, lake.depth FROM lake
+    sql = """SELECT lake.id, lake.name, p.name, lake.type, lake.depth FROM lake
             INNER JOIN park p on (lake.park_id = p.id) WHERE lake.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_mountain(param):
-    sql = """SELECT mountain.name, p.name, mountain.elevation FROM mountain
+    sql = """SELECT mountain.id, mountain.name, p.name, mountain.elevation FROM mountain
             INNER JOIN park p on (mountain.park_id = p.id) WHERE mountain.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 # TODO: FOR SOME REASON THIS AIN'T WORKING
 def get_trail(param):
-    sql = """SELECT trail.name, p.name, trail.distance FROM trail
+    sql = """SELECT trail.id, trail.name, p.name, trail.distance FROM trail
             INNER JOIN park p on (trail.park_id = p.id) WHERE trail.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
