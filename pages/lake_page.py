@@ -73,7 +73,6 @@ def update():
     
     if (st.button('Update', key = 'lake_update_button')):
         tm.update_lake(name, attr, newAttr)
-        tm.commitData()
 
 def add():
     new_name = st.text_input('Enter Lake name:', key = 'lake_add_name')
@@ -85,7 +84,6 @@ def add():
 
     if (st.button('Add', key = 'sp_add_button')):
         tm.insert_lake(new_name, new_park_id, new_type, new_depth)
-        tm.commitData()
 
 def delete():
     tempdf = lake_dataframe.sort_values(by = ['Name'])
@@ -93,7 +91,6 @@ def delete():
 
     if (st.button('Delete', key = 'lake_delete_button')):
         tm.delete_lake(name)
-        tm.commitData()
 
 def main():
     global lake_dataframe

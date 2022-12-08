@@ -58,7 +58,6 @@ def update():
             ['Africa', 'Asia', 'North America', 'South America', 'Oceania', 'Europe'])
     if(st.button('Update', key="country_update_button")):
         tm.update_country(name, attr, newAttr)
-        tm.commitData()
 
 def add():
     new_name = st.text_input('Enter Country name:')
@@ -66,7 +65,6 @@ def add():
             ['Africa', 'Asia', 'North America', 'South America', 'Oceania', 'Europe'])
     if(st.button('Add', key="country_add_button")):
         tm.insert_country(new_name, new_region)
-        tm.commitData()
 
 def delete():
     tempdf = country_dataframe.sort_values(by=['Name'])
@@ -74,7 +72,6 @@ def delete():
         tempdf['Name'])
     if(st.button('Delete', key="country_delete_button")):
         tm.delete_country(name)
-        tm.commitData()
 
 def main():
 
