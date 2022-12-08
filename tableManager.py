@@ -562,29 +562,33 @@ def get_country(param):
 def get_state_province(param):
     # print("STATE_PROVINCE")
     sql = """SELECT state_province.id, state_province.name, country.name FROM state_province 
-             LEFT JOIN country ON (country.id=country_id) WHERE state_province.name LIKE %s"""
+            INNER JOIN country ON (country.id=country_id) WHERE state_province.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_park(param):
     # print("PARK")
-    sql = """SELECT * FROM park WHERE name LIKE %s"""
+    sql = """SELECT park.id, park.name, park.visitors_per_year, sp.name, park.area, park.year_established FROM park
+            INNER JOIN state_province sp on (park.state_province_id = sp.id) WHERE park.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_lake(param):
-    sql = "SELECT * FROM lake WHERE name LIKE %s"
+    sql = """SELECT lake.name, p.name, lake.type, lake.depth FROM lake
+            INNER JOIN park p on (lake.park_id = p.id) WHERE lake.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_mountain(param):
-    sql = "SELECT * FROM mountain WHERE name LIKE %s"
+    sql = """SELECT mountain.name, p.name, mountain.elevation FROM mountain
+            INNER JOIN park p on (mountain.park_id = p.id) WHERE mountain.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 # TODO: FOR SOME REASON THIS AIN'T WORKING
 def get_trail(param):
-    sql = "SELECT * FROM trail WHERE name LIKE %s"
+    sql = """SELECT trail.name, p.name, trail.distance FROM trail
+            INNER JOIN park p on (trail.park_id = p.id) WHERE trail.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
