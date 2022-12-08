@@ -69,7 +69,7 @@ def update():
     elif attr == 'Type':
         newAttr = st.text_input('Enter the new Type', key = 'lake_new_type')
     elif attr == 'Depth':
-        newAttr = st.text_input('Enter the new Depth', key = 'lake_new_depth')
+        newAttr = st.number_input('Enter the new Depth', key = 'lake_new_depth')
     
     if (st.button('Update', key = 'lake_update_button')):
         tm.update_lake(name, attr, newAttr)
@@ -81,7 +81,7 @@ def add():
     tm.mycursor.execute("""SELECT id FROM park WHERE name = %s""", (new_park, ))
     new_park_id = tm.mycursor.fetchone()[0]
     new_type = st.text_input('Enter Lake type:', key = 'lake_add_type')
-    new_depth = st.text_input('Enter Lake depth:', key = 'lake_add_depth')
+    new_depth = st.number_input('Enter Lake depth:', key = 'lake_add_depth')
 
     if (st.button('Add', key = 'sp_add_button')):
         tm.insert_lake(new_name, new_park_id, new_type, new_depth)

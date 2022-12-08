@@ -65,7 +65,7 @@ def update():
             tm.mycursor.execute("""SELECT id FROM park WHERE name = %s""", (new_park, ))
             newAttr = tm.mycursor.fetchone()[0]
         case 'Elevation':
-            newAttr = st.text_input('Enter the new elevation', key = 'mountain_new_elevation')
+            newAttr = st.number_input('Enter the new elevation', key = 'mountain_new_elevation')
 
     if (st.button('Update', key = 'mountain_update_button')):
         tm.update_mountain(name, attr, newAttr)
@@ -76,7 +76,7 @@ def add():
     new_park = st.selectbox('Select Park', list(pp.gen_park_dataframe('').sort_values(by = ['Name']).loc()[:, 'Name']))
     tm.mycursor.execute("""SELECT id FROM park WHERE name = %s""", (new_park, ))
     new_park_id = tm.mycursor.fetchone()[0]
-    new_elevation = st.text_input('Enter Mountain elevation:', key = 'mountain_add_elevation')
+    new_elevation = st.number_input('Enter Mountain elevation:', key = 'mountain_add_elevation')
 
     if (st.button('Add', key = 'mountain_add_button')):
         tm.insert_mountain(new_name, new_park_id, new_elevation)
