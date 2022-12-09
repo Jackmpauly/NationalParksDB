@@ -17,7 +17,8 @@ def rollback():
     mycursor.execute("ROLLBACK")
 
 def commitData():
-    mycursor.execute("COMMIT")
+    #mycursor.execute("COMMIT")
+    mydb.commit()
 
 def isNull(str):
     if( str == "NULL" ):
@@ -694,11 +695,29 @@ def get_mountain(param):
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-# TODO: FOR SOME REASON THIS AIN'T WORKING
 def get_trail(param):
     sql = """SELECT trail.id, trail.name, p.name, trail.distance FROM trail
             INNER JOIN park p on (trail.park_id = p.id) WHERE trail.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
+    return mycursor.fetchall()
+
+def get_joined_table():
+    sql = """
+        SELECT park.name, park.area, park.visitors_per_year, park.year_established, state_provinces.name, countries.name, countries. region,
+        (SELECT COUNT(id)
+            FROM lake
+            WHERE lake.park_id = park.id) AS numLakes,
+        (SELECT COUNT(id)
+            FROM mountain
+            WHERE mountain.park_id = park.id) AS numMountains,
+        (SELECT COUNT(id)
+            FROM trail
+            WHERE trail.park_id = park.id) AS numTrails
+        FROM park
+        INNER JOIN state_province state_provinces ON park.state_province_id = state_provinces.id
+        INNER JOIN country countries ON state_provinces.country_id = countries.id
+        """
+    mycursor.execute(sql)
     return mycursor.fetchall()
 
 def print_all():
