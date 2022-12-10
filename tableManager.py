@@ -20,6 +20,9 @@ def commitData():
     #mycursor.execute("COMMIT")
     mydb.commit()
 
+def commitDataCheck():
+    mydb.commit()
+
 def isNull(str):
     if( str == "NULL" ):
         # print("here")
@@ -69,7 +72,7 @@ def insert_country(name, region):
         print("An invalid region was entered: " + region)
         rollback()
 
-    commitData()
+    commitDataCheck()
 
 def update_country(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM country WHERE name = %s""", (name, ))
@@ -161,7 +164,7 @@ def is_duplicate_state_province(name, country_id):
         return False
 
 def insert_state_province(name, country_id):
-    dupe = is_duplicate_state_province(mycursor, name, country_id)
+    dupe = is_duplicate_state_province(name, country_id)
 
     statement = "INSERT INTO state_province (name, country_id) VALUES (%s, %s)"
     if(dupe):
@@ -174,7 +177,7 @@ def insert_state_province(name, country_id):
             print("Something went wrong. {}".format(error))
             rollback()
 
-        commitData()
+        commitDataCheck()
         
 def update_state_province(old_name, attr, val):
     mycursor.execute(
@@ -275,7 +278,7 @@ def insert_park(name, visitors_per_year, state_province_id, area, year_establish
         print("Something went wrong. {}".format(error))
         rollback()
     
-    commitData()
+    commitDataCheck()
 
 def update_park(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM park WHERE name = %s""", (name,))
@@ -396,11 +399,11 @@ def update_lake(name, attribute, new_value):
     match attribute:
         case 'Name':
             current_name = new_value
-        case 'Park ID':
+        case 'Park':
             park_id = new_value
         case 'Type':
             type = new_value
-        case 'Depth':
+        case 'Depth (m)':
             depth = new_value
 
     begin_transaction()
@@ -497,9 +500,9 @@ def update_mountain(name, attribute, new_value):
     match attribute:
         case 'Name':
             current_name = new_value
-        case 'Park ID':
+        case 'Park':
             park_id = new_value
-        case 'Elevation':
+        case 'Elevation (m)':
             elevation = new_value
 
     begin_transaction()
@@ -594,9 +597,9 @@ def update_trail(name, attribute, new_value):
     id, current_name, park_id, distance = row_to_update[0], row_to_update[1], row_to_update[2], row_to_update[3]
 
     match attribute:
-        case 'name':
+        case 'Name':
             current_name = new_value
-        case 'Park ID':
+        case 'Park':
             park_id = new_value
         case 'Distance (km)':
             distance = new_value

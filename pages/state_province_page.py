@@ -1,89 +1,103 @@
-#importing streamlit library
-import mysql.connector
 import streamlit as st
 import pandas as pd
 import tableManager as tm
 
-
 import pages.country_page as cp
 
 sp_dataframe = None
-country_dataframe = None
 
+# Generate the State/Province dataframe
 def gen_sp_dataframe(searchterm):
-    # create the empty dict (to be drawn in the table)
+    # Empty dictionary to be drawn in the table
     dict = {
         'ID':[],
         'Name':[],
         'Country':[]
     }
     df = pd.DataFrame(dict)
-
-    # loop through the state_province table and create rows, then enter them into the dataframe
+    
+    # Fill in the dataframe, filter by the searchterm
     for x in tm.get_state_province(searchterm):
-        row = pd.DataFrame({ 'ID':str(x[0]), 'Name':x[1], 'Country':str(x[2]) }, index=[0])
+        row = pd.DataFrame({'ID':str(x[0]), 
+                            'Name':x[1], 
+                            'Country':str(x[2]) }, 
+                            index=[0])
         df = pd.concat([df.loc[:], row]).reset_index(drop=True)
-
 
     return df.set_axis(['ID', 'Name', 'Country'], axis = 'columns', copy = False)
 
+# Draw the text box for the State/Province
 def draw_textbox():
-    name = st.text_input('State/Province', '', key="sp_drawTextBox")
+    name = st.text_input('State/Province', '', key='sp_drawTextBox')
     st.write('Searching for ', name)
     global sp_dataframe
     sp_dataframe = gen_sp_dataframe(name)
 
+# Modify the State/Province
 def modify():
-    global sp_dataframe
-    page_names = ['Update', 'Add', 'Delete']
-    page = st.radio('Choose one', page_names, key="sp_selection")
+    page = st.radio('Choose one', ['Update', 'Add', 'Delete'], key='sp_selection')
     st.write('You selected:', page)
 
-    if page == 'Update':
-        update()
-    elif page == 'Add':
-        add()
-    elif page == 'Delete':
-        delete()
+    match page:
+        case 'Update':
+            update()
+        case 'Add':
+            add()
+        case 'Delete':
+            delete()
+        case _:
+            st.write('Error: Invalid page name')
 
+    global sp_dataframe
     sp_dataframe = gen_sp_dataframe('')
 
 def update():
-    tempdf = sp_dataframe.sort_values(by=['Name'])
-    # Get info about current state/province. Set the new name and country id to the old name and country id
+    # Select box for Province to modify
     name = st.selectbox('Select a Province to Modify',
-        tempdf['Name'])
-
+                        sp_dataframe.sort_values(by=['Name']).loc()[:,'Name'])
+    # Radio selection for attribute to modify
     attr = st.radio('Select an attribute to modify',
-        list(sp_dataframe.columns.values)[1:], key="sp_attr")
-    if attr == 'Name':
-        newAttr = st.text_input('Enter new Name', key="sp_new_name")
-    elif attr == 'Country':
-        new_country = st.selectbox('Select country:',
-            list(cp.gen_country_dataframe('').sort_values(by=['Name']).loc()[:,'Name']))
-        tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
-        newAttr = tm.mycursor.fetchone()[0]
+                    list(sp_dataframe.columns.values)[1:], key='sp_attr')
     
-    if(st.button('Update', key="sp_update_button")):
+    # Match statement for different attributes to change
+    match attr:
+        case 'Name':
+            newAttr = st.text_input('Enter new Name', key='sp_new_name')
+        case 'Country':
+            new_country = st.selectbox('Select country:',
+                                        list(cp.gen_country_dataframe('').sort_values(by=['Name']).loc()[:,'Name']))
+            tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
+            newAttr = tm.mycursor.fetchone()[0] # Get the Country ID from the Country
+    
+    # Button to apply changes
+    if(st.button('Apply', key='sp_update_button')):
         tm.update_state_province(name, attr, newAttr)
 
 def add():
-    new_name = st.text_input('Enter State/Province name:', key="sp_new_name2")
+    # Text box for new State/Province name
+    new_name = st.text_input('Enter State/Province name:', key='sp_add_name')
+    # Select box for Country
     new_country = st.selectbox('Select country:',
-        list(cp.gen_country_dataframe('').sort_values(by=['Name']).loc()[:,'Name']))
+                                list(cp.gen_country_dataframe('').sort_values(by=['Name']).loc()[:,'Name']))
     tm.mycursor.execute("""SELECT id FROM country WHERE name = %s""", (new_country, ))
-    new_country_id = tm.mycursor.fetchone()[0]
-    if(st.button('Add', key="sp_add_button")):
+    new_country_id = tm.mycursor.fetchone()[0] # Get the Country ID from the Country
+
+    # Button to add State/Province
+    if(st.button('Add', key='sp_add_button')):
         tm.insert_state_province(new_name, new_country_id)
 
 def delete():
-    tempdf = sp_dataframe.sort_values(by=['Name'])
-    name = st.selectbox('Select a Province to Delete',
-        tempdf['Name'])
-    if(st.button('Delete', key="sp_delete_button")):
+    # Select box for Province to delete
+    name = st.selectbox('Select a State/Province to Delete',
+                        sp_dataframe.sort_values(by=['Name']).loc()[:, 'Name'])
+    
+    # Button to delete Country
+    if(st.button('Delete', key='sp_delete_button')):
         tm.delete_state_province(name)
 
+# Main method
 def main():
+    # Initializing the local State/Province dataframe
     global sp_dataframe
     sp_dataframe = gen_sp_dataframe('')
 
