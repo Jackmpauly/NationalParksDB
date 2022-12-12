@@ -672,6 +672,13 @@ def get_country(param):
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
+def get_region_from_country_name(param):
+    sql = """SELECT region
+            FROM country
+            WHERE name = %s"""
+    mycursor.execute(sql, (param, ))
+    return mycursor.fetchall()
+
 def get_state_province(param):
     # print("STATE_PROVINCE")
     sql = """SELECT state_province.id, state_province.name, country.name FROM state_province 
@@ -679,12 +686,72 @@ def get_state_province(param):
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
+def get_state_province_name_from_country_name(param):
+    sql = """SELECT state_province.name
+            FROM state_province
+            INNER JOIN country c on state_province.country_id = c.id
+            WHERE c.name = %s"""
+    mycursor.execute(sql, (param, ))
+    return mycursor.fetchall()
+
 def get_park(param):
     # print("PARK")
-    sql = """SELECT park.id, park.name, park.visitors_per_year, sp.name, park.area, park.year_established FROM park
+    sql = """SELECT park.id, park.name, 
+            CASE
+                WHEN park.visitors_per_year IS NULL THEN 'No Data'
+                ELSE park.visitors_per_year
+            END AS visitors_per_year, 
+            sp.name, park.area, park.year_established FROM park
             INNER JOIN state_province sp on (park.state_province_id = sp.id) WHERE park.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
+
+def get_all_areas():
+    sql = """SELECT DISTINCT area FROM park
+            ORDER BY area ASC"""
+    mycursor.execute(sql)
+    return mycursor.fetchall()
+
+def get_max_area():
+    sql = """SELECT MAX(area) AS maxArea
+            FROM park"""
+    mycursor.execute(sql)
+    return mycursor.fetchone()
+
+def get_min_area():
+    sql = """SELECT MIN(area) AS minArea
+            FROM park"""
+    mycursor.execute(sql)
+    return mycursor.fetchone()
+
+def get_all_visitors_per_year():
+    sql = """SELECT DISTINCT 
+            CASE
+                WHEN visitors_per_year IS NULL THEN 0
+                ELSE visitors_per_year
+            END AS visitors_per_year 
+            FROM park
+            ORDER BY visitors_per_year ASC"""
+    mycursor.execute(sql)
+    return mycursor.fetchall()
+
+def get_max_visitors_per_year():
+    sql = """SELECT MAX(visitors_per_year) AS maxVisitors
+            FROM park"""
+    mycursor.execute(sql)
+    return mycursor.fetchone()
+
+def get_min_year_established():
+    sql = """SELECT MIN(year_established) AS minYear
+            FROM park"""
+    mycursor.execute(sql)
+    return mycursor.fetchone()
+
+def get_max_year_established():
+    sql = """SELECT MAX(year_established) AS maxYear
+            FROM park"""
+    mycursor.execute(sql)
+    return mycursor.fetchone()
 
 def get_lake(param):
     sql = """SELECT lake.id, lake.name, p.name, lake.type, lake.depth FROM lake
@@ -704,9 +771,17 @@ def get_trail(param):
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
-def get_joined_table():
+# Table that is viewed on the main page
+def create_search_table_view():
+    mycursor.execute("""DROP VIEW IF EXISTS search_joined_view""")
     sql = """
-        SELECT park.name, park.area, park.visitors_per_year, park.year_established, state_provinces.name, countries.name, countries. region,
+        CREATE VIEW search_joined_view AS
+        SELECT park.id, park.name AS park_name, park.area, 
+            CASE
+                WHEN park.visitors_per_year IS NULL THEN 'No Data'
+                ELSE park.visitors_per_year
+            END AS park_visitors_per_year, 
+            park.year_established, state_provinces.name AS state_province_name, countries.name AS country_name, countries.region,
         (SELECT COUNT(id)
             FROM lake
             WHERE lake.park_id = park.id) AS numLakes,
@@ -720,6 +795,68 @@ def get_joined_table():
         INNER JOIN state_province state_provinces ON park.state_province_id = state_provinces.id
         INNER JOIN country countries ON state_provinces.country_id = countries.id
         """
+
+    try:
+        mycursor.execute(sql)
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+# Will apply the selected filters to the view object above
+def get_filtered_joined_table(params):
+    sql = """SELECT * FROM search_joined_view"""
+
+    # If there are parameters, add them to the query
+    if len(params) > 0:
+        sql += " WHERE "
+        for param in params:
+            # For numeric value ranges, need to make sure the second value is a list and that they are digits
+            if len(param[1]) == 2 and str(param[1][0]).isdigit() and str(param[1][1]).isdigit():
+                sql += param[0] + " >= " + str(param[1][0]) + " AND " + param[0] + " <= " + str(param[1][1]) + " AND "
+            # For non-numeric values, just add the LIKE clause and single quotes
+            else:
+                sql += param[0] + " LIKE " + "'" + param[1] + "'" + " AND "
+        # Remove the last AND
+        sql = sql[:-4]
+
+    # Create the filtered view for the sub-tables
+    create_filtered_joined_table_view(sql)
+
+    mycursor.execute(sql)
+    return mycursor.fetchall()
+
+# Creates a view of the filtered table to be used for filtering the sub-tables
+def create_filtered_joined_table_view(sql):
+    mycursor.execute("""DROP VIEW IF EXISTS filtered_joined_view""")
+    sql = """
+        CREATE VIEW filtered_joined_view AS
+        """ + sql
+
+    try:
+        mycursor.execute(sql)
+    except mysql.connector.DatabaseError as error:
+        print("Something went wrong. {}".format(error))
+
+# Gets the lakes from the parks that are listed in the filtered table
+def get_lakes_from_filtered_joined_table():
+    sql = """SELECT lake.id, lake.name, filtered_joined_view.park_name, lake.type, lake.depth
+            FROM lake
+            INNER JOIN filtered_joined_view ON lake.park_id = filtered_joined_view.id"""
+    mycursor.execute(sql)
+    return mycursor.fetchall()
+
+# Gets the mountains from the parks that are listed in the filtered table
+def get_mountains_from_filtered_joined_table():
+    sql = """SELECT mountain.id, mountain.name, filtered_joined_view.park_name, mountain.elevation
+            FROM mountain
+            INNER JOIN filtered_joined_view ON mountain.park_id = filtered_joined_view.id"""
+    mycursor.execute(sql)
+    return mycursor.fetchall()
+
+# Gets the trails from the parks that are listed in the filtered table
+def get_trails_from_filtered_joined_table():
+    sql = """SELECT trail.id, trail.name, filtered_joined_view.park_name, trail.distance
+            FROM trail
+            INNER JOIN filtered_joined_view ON trail.park_id = filtered_joined_view.id"""
     mycursor.execute(sql)
     return mycursor.fetchall()
 

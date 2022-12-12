@@ -11,12 +11,22 @@ import pages.mountain_page as mp
 import pages.lake_page as lp
 import pages.trail_page as tp
 
+is_initialized = None
 
+def init():
+    tm.create_search_table_view()
 
 def main():
     print("reset")
-    # writing simple text
-    # st.text("Hello")
 
+    global is_initialized
+    if (is_initialized != True):
+        is_initialized = True
+        init()
+        print('initialized')
 
-st.text('Hello')
+    st.title('Welcome to the National Park Database!')
+    st.write('Please select a page from the sidebar to begin.')
+
+if __name__ == '__main__':
+    main()
