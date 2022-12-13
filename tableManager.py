@@ -53,6 +53,7 @@ def init_country():
         for row in csv_reader:
             mycursor.execute(sql, (f'{row[1]}', f'{row[2]}'))
 
+    mycursor.execute("CREATE INDEX country_index ON country (name)")
 
     mycursor.execute("SELECT * FROM country")
     myresult = mycursor.fetchall()
@@ -143,6 +144,7 @@ def init_state_province():
         for row in csv_reader:
             mycursor.execute(sql, (f'{row[1]}', f'{int(row[2])}') )
 
+    mycursor.execute("CREATE INDEX state_province_index ON state_province (name)")
 
     mycursor.execute("SELECT * FROM state_province")
     myresult = mycursor.fetchall()
@@ -258,6 +260,7 @@ def init_park():
             # print(input)
             mycursor.execute(sql, input)
 
+    mycursor.execute("CREATE INDEX park_index ON park (name)")
 
     mycursor.execute("SELECT * FROM park")
     myresult = mycursor.fetchall()
@@ -364,6 +367,8 @@ def init_lake():
             input = ( row[1], isNull(row[2]), row[3], isNull(row[4]) )
             mycursor.execute(sql, input)
     
+    mycursor.execute("CREATE INDEX lake_index ON lake (name)")
+
     # TODO: Verification Step - Delete Later
     mycursor.execute("SELECT * FROM lake")
     myresult = mycursor.fetchall()
@@ -465,6 +470,8 @@ def init_mountain():
             input = ( row[1], isNull(row[2]), isNull(row[3]) )
             mycursor.execute(sql, input)
 
+    mycursor.execute("CREATE INDEX mountain_index ON mountain (name)")
+
     # TODO: Verification Step - Delete Later
     mycursor.execute("SELECT * FROM mountain")
     myresult = mycursor.fetchall()
@@ -563,6 +570,8 @@ def init_trail():
         for row in csv_reader:
             input = ( row[1], isNull(row[2]), row[3] )
             mycursor.execute(sql, input)
+
+    mycursor.execute("CREATE INDEX trail_index ON trail (name)")
 
     # TODO: Verification Step - Delete Later
     mycursor.execute("SELECT * FROM trail")
@@ -668,27 +677,27 @@ def test():
 
 def get_country(param):
     # print("COUNTRY")
-    sql = "SELECT * FROM country WHERE name LIKE %s"
-    mycursor.execute(sql, ('%' + param + '%', ))
+    sql = "SELECT * FROM country USE INDEX(country_index) WHERE name LIKE %s OR region LIKE %s"
+    mycursor.execute(sql, ('%' + param + '%', '%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_region_from_country_name(param):
     sql = """SELECT region
-            FROM country
+            FROM country USE INDEX(country_index)
             WHERE name = %s"""
     mycursor.execute(sql, (param, ))
     return mycursor.fetchall()
 
 def get_state_province(param):
     # print("STATE_PROVINCE")
-    sql = """SELECT state_province.id, state_province.name, country.name FROM state_province 
+    sql = """SELECT state_province.id, state_province.name, country.name FROM state_province USE INDEX(state_province_index)
             INNER JOIN country ON (country.id=country_id) WHERE state_province.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_state_province_name_from_country_name(param):
     sql = """SELECT state_province.name
-            FROM state_province
+            FROM state_province USE INDEX(state_province_index)
             INNER JOIN country c on state_province.country_id = c.id
             WHERE c.name = %s"""
     mycursor.execute(sql, (param, ))
@@ -701,7 +710,7 @@ def get_park(param):
                 WHEN park.visitors_per_year IS NULL THEN 'No Data'
                 ELSE park.visitors_per_year
             END AS visitors_per_year, 
-            sp.name, park.area, park.year_established FROM park
+            sp.name, park.area, park.year_established FROM park USE INDEX(park_index)
             INNER JOIN state_province sp on (park.state_province_id = sp.id) WHERE park.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
@@ -754,19 +763,19 @@ def get_max_year_established():
     return mycursor.fetchone()
 
 def get_lake(param):
-    sql = """SELECT lake.id, lake.name, p.name, lake.type, lake.depth FROM lake
+    sql = """SELECT lake.id, lake.name, p.name, lake.type, lake.depth FROM lake USE INDEX(lake_index)
             INNER JOIN park p on (lake.park_id = p.id) WHERE lake.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_mountain(param):
-    sql = """SELECT mountain.id, mountain.name, p.name, mountain.elevation FROM mountain
+    sql = """SELECT mountain.id, mountain.name, p.name, mountain.elevation FROM mountain USE INDEX(mountain_index)
             INNER JOIN park p on (mountain.park_id = p.id) WHERE mountain.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
 
 def get_trail(param):
-    sql = """SELECT trail.id, trail.name, p.name, trail.distance FROM trail
+    sql = """SELECT trail.id, trail.name, p.name, trail.distance FROM trail USE INDEX(trail_index)
             INNER JOIN park p on (trail.park_id = p.id) WHERE trail.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
     return mycursor.fetchall()
@@ -859,6 +868,11 @@ def get_trails_from_filtered_joined_table():
             INNER JOIN filtered_joined_view ON trail.park_id = filtered_joined_view.id"""
     mycursor.execute(sql)
     return mycursor.fetchall()
+
+# Create the indexes for the country table, state_province table, and the park table
+
+def create_country_index():
+    sql = """CREATE INDEX country_index ON """
 
 def print_all():
     for x in get_country(""):
