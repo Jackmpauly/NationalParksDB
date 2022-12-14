@@ -650,31 +650,6 @@ def delete_trail(name):
 
     commitData()
 
-def test():
-    mycursor.execute(
-        """CREATE TABLE park (
-            id INT AUTO_INCREMENT PRIMARY KEY, 
-            Name VARCHAR(100), 
-            Visitors_Per_Year INT, 
-            SP_ID INT, 
-            Area INT, 
-            Year_Established YEAR, 
-            FOREIGN KEY (SP_ID) REFERENCES state_province(ID)
-        )
-        """
-    )
-    sql = "INSERT INTO park (Name, Visitors_Per_Year, SP_ID, Area, Year_Established) VALUES (%s, %s, %s, %s, %s)"
-    string = "NULL"
-    number = "1"
-    input = ("Djebel Aissa National Park",isNull(string),isNull(number),94,2003)
-    mycursor.execute(sql, input)
-
-    mycursor.execute("SELECT * FROM park")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
-
-
 def get_country(param):
     # print("COUNTRY")
     sql = "SELECT * FROM country USE INDEX(country_index) WHERE name LIKE %s OR region LIKE %s"
