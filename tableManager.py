@@ -17,15 +17,10 @@ def rollback():
     mycursor.execute("ROLLBACK")
 
 def commitData():
-    #mycursor.execute("COMMIT")
-    mydb.commit()
-
-def commitDataCheck():
     mydb.commit()
 
 def isNull(str):
     if( str == "NULL" ):
-        # print("here")
         return None
     return int(str)
 
@@ -55,11 +50,6 @@ def init_country():
 
     mycursor.execute("CREATE INDEX country_index ON country (name)")
 
-    mycursor.execute("SELECT * FROM country")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
-
 def insert_country(name, region):
     sql = "INSERT INTO country (name, region) VALUES (%s, %s)"
 
@@ -73,7 +63,7 @@ def insert_country(name, region):
         print("An invalid region was entered: " + region)
         rollback()
 
-    commitDataCheck()
+    commitData()
 
 def update_country(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM country WHERE name = %s""", (name, ))
@@ -146,11 +136,6 @@ def init_state_province():
 
     mycursor.execute("CREATE INDEX state_province_index ON state_province (name)")
 
-    mycursor.execute("SELECT * FROM state_province")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
-
 def is_duplicate_state_province(name, country_id):
     getcount = (
         """SELECT COUNT(*) AS c FROM state_province
@@ -179,7 +164,7 @@ def insert_state_province(name, country_id):
             print("Something went wrong. {}".format(error))
             rollback()
 
-        commitDataCheck()
+        commitData()
         
 def update_state_province(old_name, attr, val):
     mycursor.execute(
@@ -257,15 +242,9 @@ def init_park():
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
             input = ( row[1], isNull(row[2]), isNull(row[3]), isNull(row[4]), isNull(row[5]) )
-            # print(input)
             mycursor.execute(sql, input)
 
     mycursor.execute("CREATE INDEX park_index ON park (name)")
-
-    mycursor.execute("SELECT * FROM park")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
 
 def insert_park(name, visitors_per_year, state_province_id, area, year_established):
     sql = "INSERT INTO park (name, visitors_per_year, state_province_id, area, year_established) VALUES (%s, %s, %s, %s, %s)"
@@ -281,7 +260,7 @@ def insert_park(name, visitors_per_year, state_province_id, area, year_establish
         print("Something went wrong. {}".format(error))
         rollback()
     
-    commitDataCheck()
+    commitData()
 
 def update_park(name, attribute, new_value):
     mycursor.execute("""SELECT * FROM park WHERE name = %s""", (name,))
@@ -368,12 +347,6 @@ def init_lake():
             mycursor.execute(sql, input)
     
     mycursor.execute("CREATE INDEX lake_index ON lake (name)")
-
-    # TODO: Verification Step - Delete Later
-    mycursor.execute("SELECT * FROM lake")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
 
 def insert_lake(name, park_id, type, depth):
     sql = "INSERT INTO lake (name, park_id, type, depth) VALUES (%s, %s, %s, %s)"
@@ -472,12 +445,6 @@ def init_mountain():
 
     mycursor.execute("CREATE INDEX mountain_index ON mountain (name)")
 
-    # TODO: Verification Step - Delete Later
-    mycursor.execute("SELECT * FROM mountain")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
-
 def insert_mountain(name, park_id, elevation):
     sql = "INSERT INTO mountain (name, park_id, elevation) VALUES (%s, %s, %s)"
 
@@ -573,12 +540,6 @@ def init_trail():
 
     mycursor.execute("CREATE INDEX trail_index ON trail (name)")
 
-    # TODO: Verification Step - Delete Later
-    mycursor.execute("SELECT * FROM trail")
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        print(x)
-
 def insert_trail(name, park_id, distance):
     sql = "INSERT INTO trail (name, park_id, distance) VALUES (%s, %s, %s)"
 
@@ -651,7 +612,6 @@ def delete_trail(name):
     commitData()
 
 def get_country(param):
-    # print("COUNTRY")
     sql = "SELECT * FROM country USE INDEX(country_index) WHERE name LIKE %s OR region LIKE %s"
     mycursor.execute(sql, ('%' + param + '%', '%' + param + '%', ))
     return mycursor.fetchall()
@@ -664,7 +624,6 @@ def get_region_from_country_name(param):
     return mycursor.fetchall()
 
 def get_state_province(param):
-    # print("STATE_PROVINCE")
     sql = """SELECT state_province.id, state_province.name, country.name FROM state_province USE INDEX(state_province_index)
             INNER JOIN country ON (country.id=country_id) WHERE state_province.name LIKE %s"""
     mycursor.execute(sql, ('%' + param + '%', ))
@@ -679,7 +638,6 @@ def get_state_province_name_from_country_name(param):
     return mycursor.fetchall()
 
 def get_park(param):
-    # print("PARK")
     sql = """SELECT park.id, park.name, 
             CASE
                 WHEN park.visitors_per_year IS NULL THEN 'No Data'
@@ -843,11 +801,6 @@ def get_trails_from_filtered_joined_table():
             INNER JOIN filtered_joined_view ON trail.park_id = filtered_joined_view.id"""
     mycursor.execute(sql)
     return mycursor.fetchall()
-
-# Create the indexes for the country table, state_province table, and the park table
-
-def create_country_index():
-    sql = """CREATE INDEX country_index ON """
 
 def print_all():
     for x in get_country(""):

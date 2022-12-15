@@ -116,14 +116,13 @@ def gen_filtered_trail_dataframe():
                             index = [0])
         df = pd.concat([df.loc[:], row]).reset_index(drop = True)
 
-    return df.set_axis(['ID', 'Name', 'Park', 'Length (m)'], axis = 'columns', copy = False)
+    return df.set_axis(['ID', 'Name', 'Park', 'Length (km)'], axis = 'columns', copy = False)
 
 # Sets up the filter section of the page
 def set_up_filter_section():
     # Variable set up for filters
     global joined_dataframe
     
-
     # Container that holds the filters
     filter_container = st.container()
     with filter_container:

@@ -2,7 +2,7 @@
 2,Nxai Pan National Park,NULL,2,2578,1992
 3,Bamingui-Bangoran National Park,NULL,3,11191,1933
 4,Day Forest National Park,NULL,4,15,1939
-5,Awash National Park,NULL,5,850,1966
+5,Awash National Park,NULL,5,15,1966
 6,Mole National Park,17800,6,4840,1958
 7,Amboseli National Park,120000,7,392,1974
 8,Souss-Massa National Park,NULL,8,338,2005
@@ -18,7 +18,7 @@
 18,Bandhavgarh National Park,108000,18,1536,1968
 19,Gir National Park,60140,19,1412,1965
 20,Komodo National Park,45000,20,1733,1980
-21,Caesarea National Park,NULL,21,35,2011
+21,Caesarea National Park,NULL,21,NULL,2011
 22,Shiretoko National Park,NULL,22,386,1964
 23,Penang National Park,1300000,23,25,2003
 24,Gobi Gurvansaikhan National Park,NULL,24,27000,1993
@@ -59,3 +59,18 @@
 59,Tasman National Park,NULL,46,108,1999
 60,Tongariro National Park,NULL,52,796,1887
 61,Uluru-Kata Tjuta National Park,400000,49,1338,1958
+62,Doñana National Park,393000,53,543,1969
+63,Vanoise National Park,360000,54,534,1969
+64,Bavaria Forest National Park,1300000,55,242,1970
+65,Sarek National Park,2000,56,1970,1909
+66,Nuuksio National Park,339000,57,73,1994
+67,Vatnajökull,NULL,58,14141,2008
+68,Triglav National Park,1600000,59,546,1981
+69,Retezat National Park,NULL,60,380,2000
+70,Tatra National Park,3500000,61,212,1954
+71,Swiss National Park,120000,62,172,1914
+72,Hohe Tauern National Park,400000,63,1856,1981
+73,Cinque Terre National Park,5000000,64,39,1999
+74,Killarney National Park,1100000,65,103,1932
+75,Podilsky Tovtry National Park,NULL,66,2316,1996
+76,Mount Olympus National Park,2720000,67,238,1909
